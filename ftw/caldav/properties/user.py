@@ -67,8 +67,11 @@ class UserCalDAVProperties(CalDAVPropertiesAdapter):
         member = mtool.getAuthenticatedMember()
 
         if member.getProperty('email'):
-            value = 'mailto:%s' % member.getProperty('email')
-        else:
-            value = '/'.join((urltool(), 'caldav-calendars', member.getId()))
+            etree.SubElement(parent_node, '{DAV:}href').text = 'mailto:%s' % (
+                member.getProperty('email'))
 
-        etree.SubElement(parent_node, '{DAV:}href').text = value
+        etree.SubElement(parent_node, '{DAV:}href').text = 'userid:%s' % (
+            member.getId())
+
+        etree.SubElement(parent_node, '{DAV:}href').text = '/'.join(
+            (urltool(), 'caldav-principal', member.getId()))

@@ -73,6 +73,9 @@ class TestPropfindOnPrincipal(TestCase):
         self.assertEquals(
             ''.join(('<calendar-user-address-set>',
                      '<href>mailto:test@user.com</href>',
+                     '<href>userid:test_user_1_</href>',
+                     '<href>%s/caldav-principal/test_user_1_</href>' % (
+                        self.layer['portal'].portal_url()),
                      '</calendar-user-address-set>')),
             propfind.property_xml('calendar-user-address-set'))
 
