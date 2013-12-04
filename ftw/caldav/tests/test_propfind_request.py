@@ -1,7 +1,10 @@
+from Products.CMFCore.utils import getToolByName
 from ftw.caldav.testing import CALDAV_ZSERVER_FUNCTIONAL_TESTING
 from ftw.caldav.tests.pages import propfind
 from ftw.testbrowser import browsing
+from plone.app.testing import TEST_USER_ID
 from unittest2 import TestCase
+import transaction
 
 
 class TestPropfindRequestOnRoot(TestCase):
@@ -103,16 +106,25 @@ class TestPropfindRequestOnRoot(TestCase):
             propfind.property_xml('calendar-home-set'))
 
     @browsing
-    def test_calendar_user_address_set_unsupported(self, browser):
+    def test_calendar_user_address_set(self, browser):
         # http://tools.ietf.org/html/rfc6638#section-2.4.1
-        # "calendar-user-address-set" is part of the scheduling extension
-        # which is not (yet) implemented.
+        mtool = getToolByName(self.layer['portal'], 'portal_membership')
+        member = mtool.getMemberById(TEST_USER_ID)
+        member.setMemberProperties({'email': 'test@user.com'})
+        transaction.commit()
 
         req_body = propfind.make_propfind_request_body({
                 'urn:ietf:params:xml:ns:caldav': ['calendar-user-address-set']})
         browser.login().webdav('PROPFIND', data=req_body)
-        self.assertEquals('HTTP/1.1 404 Not Found',
+        self.assertEquals('HTTP/1.1 200 OK',
                           propfind.status_for_property('calendar-user-address-set'))
+
+        self.assertEquals(
+            ''.join(('<calendar-user-address-set'
+                     ' xmlns:n="urn:ietf:params:xml:ns:caldav">',
+                     '<href xmlns:n="DAV:">mailto:test@user.com</href>',
+                     '</calendar-user-address-set>')),
+            propfind.property_xml('calendar-user-address-set'))
 
     @browsing
     def test_schedule_inbox_URL_unsupported(self, browser):
