@@ -31,13 +31,16 @@ class UserCalDAVProperties(CalDAVPropertiesAdapter):
         return self.context.getProperty('fullname') or self.context.getId()
 
     @caldav_property('calendar-home-set', 'urn:ietf:params:xml:ns:caldav')
-    def calendar_home_set(self):
+    @caldav_callback
+    def calendar_home_set(self, parent_node):
         """http://tools.ietf.org/html/rfc4791#section-6.2.1
         Identifies the URL of any WebDAV collections that contain
         calendar collections owned by the associated principal resource.
         """
         urltool = getToolByName(self.context, 'portal_url')
-        return '/'.join((urltool(), 'caldav-calendars', self.context.getId()))
+        url = '/'.join((urltool(), 'caldav-calendars', self.context.getId()))
+
+        etree.SubElement(parent_node, '{DAV:}href').text = url
 
     @caldav_property('calendar-user-address-set', 'urn:ietf:params:xml:ns:caldav')
     @caldav_callback
