@@ -40,6 +40,7 @@ setup(name='ftw.caldav',
 
       install_requires=[
         'setuptools',
+        'collective.monkeypatcher',
         ],
 
       tests_require=tests_require,

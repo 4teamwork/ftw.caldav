@@ -1,7 +1,27 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
+    xmlns:monkey="http://namespaces.plone.org/monkey"
     i18n_domain="ftw.caldav">
 
+
     <include package=".browser" />
+
+    <include package="collective.monkeypatcher" />
+    <monkey:patch
+        description="DAVProperties: support properties with hyphens."
+        class="OFS.PropertySheets.DAVProperties"
+        original="getProperty"
+        replacement=".patches.DAVProperties_getProperty"
+        />
+
+    <monkey:patch
+        description="Extend Zope WebDAV with CalDAV 'current-user-principal' property."
+        class="OFS.PropertySheets.DAVProperties"
+        original="dav__current_user_principal"
+        replacement=".patches.dav__current_user_principal"
+        ignoreOriginal="true"
+        />
+
+
 
 </configure>

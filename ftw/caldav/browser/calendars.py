@@ -35,3 +35,7 @@ class CalendarsView(BrowserView):
 
 class PloneCalendarsView(CalendarsView):
     pass
+
+
+class UserCalendarsView(CalendarsView):
+    pass

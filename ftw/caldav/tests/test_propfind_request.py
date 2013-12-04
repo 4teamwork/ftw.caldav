@@ -16,8 +16,10 @@ class TestPropfindRequestOnRoot(TestCase):
         req_body = propfind.make_propfind_request_body({
                 'DAV:': ['current-user-principal']})
         browser.login().webdav('PROPFIND', view='calendars', data=req_body)
-        self.assertEquals('HTTP/1.1 404 Not Found',
+        self.assertEquals('HTTP/1.1 200 OK',
                           propfind.status_for_property('current-user-principal'))
+        self.assertEquals('%s/user-calendars' % self.layer['portal'].portal_url(),
+                          propfind.property_value('current-user-principal'))
 
     @browsing
     def test_displayname(self, browser):
