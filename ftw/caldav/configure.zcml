@@ -12,6 +12,13 @@
     <include file="permissions.zcml" />
     <include file="patches.zcml" />
 
+
+    <subscriber
+        for="ftw.caldav.interfaces.ICalendar
+             zope.lifecycleevent.interfaces.IObjectModifiedEvent"
+        handler=".ctag.update_calendar_ctag_handler"
+        />
+
     <genericsetup:registerProfile
         name="default"
         title="ftw.caldav"

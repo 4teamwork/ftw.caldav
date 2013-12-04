@@ -16,4 +16,11 @@
         permission="zope.Public"
         />
 
+    <browser:page
+        name="caldav"
+        for="ftw.caldav.interfaces.ICalendar"
+        class=".calendars.CalendarView"
+        permission="zope.Public"
+        />
+
 </configure>

@@ -73,3 +73,27 @@ class CalendarsView(BrowserView):
         RESPONSE.setHeader('DAV', '1, 2, calendar-access')
         RESPONSE.setStatus(200)
         return RESPONSE
+
+
+class CalendarView(BrowserView):
+    security = ClassSecurityInfo()
+    security.setPermissionDefault(webdav_access, ('Authenticated', 'Manager'))
+
+    security.declareProtected(webdav_access, 'PROPFIND')
+    @authenticated
+    def PROPFIND(self, REQUEST, RESPONSE):
+        """Retrieve properties of the current user."""
+        provider = getMultiAdapter((self.context, self.request), ICalDAVProperties)
+        generator = getAdapter(self.request, IPROPFINDDocumentGenerator)
+        return generator.generate([provider])
+
+    security.declarePublic('OPTIONS')
+    @authenticated
+    def OPTIONS(self, REQUEST, RESPONSE):
+        """Retrieve OPTIONS.
+        """
+        RESPONSE.setHeader('Allow', ', '.join(['PROPFIND', 'OPTIONS']))
+        RESPONSE.setHeader('Content-Length', 0)
+        RESPONSE.setHeader('DAV', '1, 2, calendar-access')
+        RESPONSE.setStatus(200)
+        return RESPONSE
