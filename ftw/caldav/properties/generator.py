@@ -39,10 +39,17 @@ class PROPFINDDocumentGenerator(object):
         else:
             property_names = [prop[0] for prop in select_properties]
         self._add_properties_by_statuscode(
-            response, properties_provider.get_properties(property_names,
-                                                         names_only=names_only))
+            response,
+            properties_provider.get_properties(property_names, names_only=names_only),
+            select_properties)
 
-    def _add_properties_by_statuscode(self, response, properties):
+    def _add_properties_by_statuscode(self, response, properties,
+                                      requested_properties):
+        if requested_properties is not None:
+            missing_properties = requested_properties[:]
+        else:
+            missing_properties = []
+
         properties_by_code = group_properties_by_status_code(properties)
 
         for code, properties in properties_by_code.items():
@@ -57,9 +64,23 @@ class PROPFINDDocumentGenerator(object):
                     property['callback'](prop_node)
                 elif 'value' in property:
                     prop_node.text = str(property['value'])
+                if (property['name'], property['namespace']) in missing_properties:
+                    missing_properties.remove(
+                        (property['name'], property['namespace']))
 
             etree.SubElement(propstat, '{DAV:}status').text = 'HTTP/1.1 %s %s' % (
                 code, httplib.responses[code])
+
+        if not missing_properties:
+            return
+
+        propstat = etree.SubElement(response, '{DAV:}propstat')
+        prop = etree.SubElement(propstat, '{DAV:}prop')
+        for property_name, property_namespace in missing_properties:
+            etree.SubElement(prop, '{%s}%s' % (property_namespace, property_name))
+
+        etree.SubElement(propstat, '{DAV:}status').text = 'HTTP/1.1 %s %s' % (
+            '404', httplib.responses[404])
 
     def generate(self, properties_provider):
         names_only = False
