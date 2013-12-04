@@ -32,11 +32,23 @@ class CalDAVPropertiesAdapter(object):
         self.context = context
         self.request = request
 
-    def get_properties(self, names=None):
+    def get_href(self):
+        raise NotImplementedError()
+
+    def get_subelements(self):
+        return []
+
+    def get_properties(self, names=None, names_only=False):
         result = []
 
         for property_info in self._discover_properties():
             if names is not None and property_info['name'] not in names:
+                continue
+
+            if names_only:
+                result.append({'name': property_info['name'],
+                               'namespace': property_info['namespace'],
+                               'status_code': 200})
                 continue
 
             if property_info['is_callback']:

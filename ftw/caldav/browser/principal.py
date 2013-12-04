@@ -3,6 +3,10 @@ from AccessControl import Unauthorized
 from AccessControl.Permissions import webdav_access
 from Products.CMFCore.utils import getToolByName
 from ftw.caldav.browser.helpers import authenticated
+from ftw.caldav.interfaces import ICalDAVProperties
+from ftw.caldav.interfaces import IPROPFINDDocumentGenerator
+from zope.component import getAdapter
+from zope.component import getMultiAdapter
 from zope.interface import implements
 from zope.publisher.browser import BrowserView
 from zope.publisher.interfaces import IPublishTraverse
@@ -43,6 +47,8 @@ class PrincipalView(BrowserView):
     security.declareProtected(webdav_access, 'PROPFIND')
     @authenticated
     def PROPFIND(self, REQUEST, RESPONSE):
-        """Retrieve properties defined on the resource."""
+        """Retrieve properties of the current user."""
         member = self.getMember()
-        return member.PROPFIND(REQUEST, RESPONSE)
+        provider = getMultiAdapter((member, self.request), ICalDAVProperties)
+        generator = getAdapter(self.request, IPROPFINDDocumentGenerator)
+        return generator.generate(provider)

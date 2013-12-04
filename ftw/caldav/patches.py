@@ -16,6 +16,8 @@ def DAVProperties_getProperty(self, id, default=None):
 
 
 def dav__current_user_principal(self):
+    # XXX: the "current-user-principal" should contain a
+    # DAV:href or DAV:unauthenticated element, not URL directly!
     urltool = getToolByName(self, 'portal_url')
     mtool = getToolByName(self, 'portal_membership')
     member = mtool.getAuthenticatedMember()

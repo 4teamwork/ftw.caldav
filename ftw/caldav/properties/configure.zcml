@@ -3,5 +3,6 @@
     i18n_domain="ftw.caldav">
 
     <adapter factory=".user.UserCalDAVProperties" />
+    <adapter factory=".generator.PROPFINDDocumentGenerator" />
 
 </configure>
