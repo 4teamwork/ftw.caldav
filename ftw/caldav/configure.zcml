@@ -1,11 +1,27 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
     xmlns:monkey="http://namespaces.plone.org/monkey"
     i18n_domain="ftw.caldav">
 
-
     <include package=".browser" />
     <include package=".properties" />
+
+    <genericsetup:registerProfile
+        name="default"
+        title="ftw.caldav"
+        directory="profiles/default"
+        description="CalDAV support for Plone."
+        provides="Products.GenericSetup.interfaces.EXTENSION"
+        />
+
+    <genericsetup:importStep
+        name="ftw.caldav"
+        title="Install additional components required by ftw.caldav."
+        description=""
+        handler="ftw.caldav.setuphandlers.install_caldav"
+        />
 
     <include package="collective.monkeypatcher" />
     <monkey:patch

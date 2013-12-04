@@ -70,8 +70,17 @@ class TestPropfindRequestOnRoot(TestCase):
         req_body = propfind.make_propfind_request_body({
                 'urn:ietf:params:xml:ns:caldav': ['calendar-home-set']})
         browser.login().webdav('PROPFIND', data=req_body)
-        self.assertEquals('HTTP/1.1 404 Not Found',
+        self.assertEquals('HTTP/1.1 200 OK',
                           propfind.status_for_property('calendar-home-set'))
+        url = '%s/caldav-calendars/test_user_1_' % self.layer['portal'].portal_url()
+
+        self.assertEquals(
+            ''.join(('<calendar-home-set xmlns:n="urn:ietf:params:xml:ns:caldav">',
+                     '<href xmlns:n="DAV:">',
+                     url,
+                     '</href>',
+                     '</calendar-home-set>')),
+            propfind.property_xml('calendar-home-set'))
 
     @browsing
     def test_calendar_user_address_set_unsupported(self, browser):
