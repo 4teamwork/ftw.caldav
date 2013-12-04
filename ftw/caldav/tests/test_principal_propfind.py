@@ -52,7 +52,7 @@ class TestPropfindOnPrincipal(TestCase):
         self.assertEquals('HTTP/1.1 200 OK',
                           propfind.status_for_property('calendar-home-set'))
         self.assertEquals(
-            '%s/caldav-calendars/test_user_1_' % self.layer['portal'].portal_url(),
+            '/plone/caldav-calendars/test_user_1_',
             propfind.property_value('calendar-home-set'))
 
     @browsing
@@ -74,8 +74,7 @@ class TestPropfindOnPrincipal(TestCase):
             ''.join(('<calendar-user-address-set>',
                      '<href>mailto:test@user.com</href>',
                      '<href>userid:test_user_1_</href>',
-                     '<href>%s/caldav-principal/test_user_1_</href>' % (
-                        self.layer['portal'].portal_url()),
+                     '<href>/plone/caldav-principal/test_user_1_</href>',
                      '</calendar-user-address-set>')),
             propfind.property_xml('calendar-user-address-set'))
 
@@ -88,7 +87,7 @@ class TestPropfindOnPrincipal(TestCase):
                                data=req_body)
         self.assertEquals('HTTP/1.1 200 OK',
                           propfind.status_for_property('current-user-principal'))
-        url = '%s/caldav-principal/test_user_1_' % self.layer['portal'].portal_url()
+        url = '/plone/caldav-principal/test_user_1_'
 
         self.assertEquals(
             ''.join(('<current-user-principal>',

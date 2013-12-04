@@ -3,6 +3,7 @@ from Products.CMFCore.utils import getToolByName
 from ftw.caldav.properties.adapter import CalDAVPropertiesAdapter
 from ftw.caldav.properties.adapter import caldav_callback
 from ftw.caldav.properties.adapter import caldav_property
+from ftw.caldav.utils import portal_url_prefix
 from lxml import etree
 from zope.component import adapts
 from zope.interface import Interface
@@ -37,10 +38,8 @@ class UserCalDAVProperties(CalDAVPropertiesAdapter):
         Identifies the URL of any WebDAV collections that contain
         calendar collections owned by the associated principal resource.
         """
-        urltool = getToolByName(self.context, 'portal_url')
-        url = '/'.join((urltool(), 'caldav-calendars', self.context.getId()))
-
-        etree.SubElement(parent_node, '{DAV:}href').text = url
+        etree.SubElement(parent_node, '{DAV:}href').text = '/'.join(
+            (portal_url_prefix(), 'caldav-calendars', self.context.getId()))
 
     @caldav_property('current-user-principal', 'DAV:')
     @caldav_callback
@@ -49,10 +48,8 @@ class UserCalDAVProperties(CalDAVPropertiesAdapter):
         Indicates a URL for the currently authenticated user's
         principal resource on the server.
         """
-        urltool = getToolByName(self.context, 'portal_url')
-        url = '/'.join((urltool(), 'caldav-principal', self.context.getId()))
-
-        etree.SubElement(parent_node, '{DAV:}href').text = url
+        etree.SubElement(parent_node, '{DAV:}href').text = '/'.join(
+            (portal_url_prefix(), 'caldav-principal', self.context.getId()))
 
     @caldav_property('calendar-user-address-set', 'urn:ietf:params:xml:ns:caldav')
     @caldav_callback
@@ -62,7 +59,6 @@ class UserCalDAVProperties(CalDAVPropertiesAdapter):
         resource.
         """
 
-        urltool = getToolByName(self.context, 'portal_url')
         mtool = getToolByName(self.context, 'portal_membership')
         member = mtool.getAuthenticatedMember()
 
@@ -74,4 +70,4 @@ class UserCalDAVProperties(CalDAVPropertiesAdapter):
             member.getId())
 
         etree.SubElement(parent_node, '{DAV:}href').text = '/'.join(
-            (urltool(), 'caldav-principal', member.getId()))
+            (portal_url_prefix(), 'caldav-principal', member.getId()))
