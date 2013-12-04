@@ -51,7 +51,7 @@ class PrincipalView(BrowserView):
         member = self.getMember()
         provider = getMultiAdapter((member, self.request), ICalDAVProperties)
         generator = getAdapter(self.request, IPROPFINDDocumentGenerator)
-        return generator.generate(provider)
+        return generator.generate([provider])
 
     security.declarePublic('OPTIONS')
     @authenticated

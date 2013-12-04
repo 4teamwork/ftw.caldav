@@ -94,7 +94,7 @@ class TestPROPFINDDocumentGenerator(TestCase):
 
         provider = ExampleProperties(None, None)
         adapter = getAdapter(self.layer['request'], IPROPFINDDocumentGenerator)
-        adapter.generate(provider)
+        adapter.generate([provider])
 
         self.assertEquals(207, request.RESPONSE.getStatus())
         self.assertEquals(
@@ -112,7 +112,7 @@ class TestPROPFINDDocumentGenerator(TestCase):
 
         provider = ExampleProperties(None, None)
         adapter = getAdapter(self.layer['request'], IPROPFINDDocumentGenerator)
-        adapter.generate(provider)
+        adapter.generate([provider])
 
         self.assertEquals(207, request.RESPONSE.getStatus())
         self.assertEquals(
@@ -131,7 +131,7 @@ class TestPROPFINDDocumentGenerator(TestCase):
 
         provider = ExampleProperties(None, None)
         adapter = getAdapter(self.layer['request'], IPROPFINDDocumentGenerator)
-        adapter.generate(provider)
+        adapter.generate([provider])
 
         self.assertEquals(207, request.RESPONSE.getStatus())
         self.assertEquals(

@@ -49,10 +49,10 @@ class IPROPFINDDocumentGenerator(Interface):
         and the XML-namespace it is defined in.
         """
 
-    def generate(properties_provider):
+    def generate(property_providers):
         """Generate the XML response for the PROPFIND request by reading the request
         information and writing to the response directly at the end.
 
-        The information is provided by the ``properties_provider``, implementing
-        ICalDAVProperties.
+        For each property provider (``property_providers``), a response in the
+        PROPFIND request is generated. Each provider must implement ICalDAVProperties.
         """

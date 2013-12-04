@@ -82,7 +82,7 @@ class PROPFINDDocumentGenerator(object):
         etree.SubElement(propstat, '{DAV:}status').text = 'HTTP/1.1 %s %s' % (
             '404', httplib.responses[404])
 
-    def generate(self, properties_provider):
+    def generate(self, property_providers, subobjects=None):
         names_only = False
         properties = self._extract_request_properties()
 
@@ -94,8 +94,11 @@ class PROPFINDDocumentGenerator(object):
             properties = None
 
         document = self.create_document()
-        self.add_response(document, properties_provider,
-                          select_properties=properties, names_only=names_only)
+        for provider in property_providers:
+            self.add_response(document,
+                              provider,
+                              select_properties=properties,
+                              names_only=names_only)
 
         response = self.request.RESPONSE
         response.setStatus(207)
