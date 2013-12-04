@@ -27,9 +27,15 @@ class TestPropfindRequestOnRoot(TestCase):
         browser.login().webdav('PROPFIND', data=req_body)
         self.assertEquals('HTTP/1.1 200 OK',
                           propfind.status_for_property('current-user-principal'))
+        url = '%s/caldav-principal/test_user_1_' % self.layer['portal'].portal_url()
+
         self.assertEquals(
-            '%s/caldav-principal/test_user_1_' % self.layer['portal'].portal_url(),
-            propfind.property_value('current-user-principal'))
+            ''.join(('<current-user-principal xmlns:n="DAV:">',
+                     '<href xmlns:n="DAV:">',
+                     url,
+                     '</href>',
+                     '</current-user-principal>')),
+            propfind.property_xml('current-user-principal'))
 
     @browsing
     def test_displayname(self, browser):

@@ -1,4 +1,5 @@
 from ftw.testbrowser import browser
+from lxml import etree
 
 
 PROPFIND_REQUEST_TEMPLATE = '''<?xml version="1.0" encoding="UTF-8"?>
@@ -26,6 +27,12 @@ def property_type(property_name):
     prop = browser.css(property_name)
     assert len(prop) > 0, 'No property "%s" found in response.' % property_name
     return prop.first.css('>*').first.tag
+
+
+def property_xml(property_name):
+    prop = browser.css(property_name)
+    assert len(prop) > 0, 'No property "%s" found in response.' % property_name
+    return etree.tostring(prop.first.node)
 
 
 def make_propfind_request_body(properties):
