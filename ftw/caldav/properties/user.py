@@ -38,3 +38,22 @@ class UserCalDAVProperties(CalDAVPropertiesAdapter):
         """
         urltool = getToolByName(self.context, 'portal_url')
         return '/'.join((urltool(), 'caldav-calendars', self.context.getId()))
+
+    @caldav_property('calendar-user-address-set', 'urn:ietf:params:xml:ns:caldav')
+    @caldav_callback
+    def calendar_user_address_set(self, parent_node):
+        """http://tools.ietf.org/html/rfc6638#section-2.4.1
+        Identify the calendar addresses of the associated principal
+        resource.
+        """
+
+        urltool = getToolByName(self.context, 'portal_url')
+        mtool = getToolByName(self.context, 'portal_membership')
+        member = mtool.getAuthenticatedMember()
+
+        if member.getProperty('email'):
+            value = 'mailto:%s' % member.getProperty('email')
+        else:
+            value = '/'.join((urltool(), 'caldav-calendars', member.getId()))
+
+        etree.SubElement(parent_node, '{DAV:}href').text = value
