@@ -96,3 +96,22 @@ class TestPropfindOnPrincipal(TestCase):
                      '<href>%s</href>' % url,
                      '</current-user-principal>')),
             propfind.property_xml('current-user-principal'))
+
+    @browsing
+    def test_principal_URL(self, browser):
+        # http://tools.ietf.org/html/rfc3744#section-4.2
+        # This protected property contains the URL that MUST be used to identify
+        # this principal in an ACL request.
+        req_body = propfind.make_propfind_request_body({
+                'DAV:': ['principal-URL']})
+        browser.login().webdav('PROPFIND', view='caldav-principal/test_user_1_',
+                               data=req_body)
+        self.assertEquals('HTTP/1.1 200 OK',
+                          propfind.status_for_property('principal-URL'))
+
+        url = '%s/caldav-principal/test_user_1_' % self.layer['portal'].portal_url()
+        self.assertEquals(
+            ''.join(('<principal-url>',
+                     '<href>%s</href>' % url,
+                     '</principal-url>')),
+            propfind.property_xml('principal-URL'))

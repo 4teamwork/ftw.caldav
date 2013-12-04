@@ -53,6 +53,16 @@ class UserCalDAVProperties(CalDAVPropertiesAdapter):
         etree.SubElement(parent_node, '{DAV:}href').text = '/'.join(
             (portal_url(), 'caldav-principal', self.context.getId()))
 
+    @caldav_property('principal-URL', 'DAV:')
+    @caldav_callback
+    def principal_url(self, parent_node):
+        """http://tools.ietf.org/html/rfc3744#section-4.2
+        """
+
+        portal_url = getToolByName(self.context, 'portal_url')
+        etree.SubElement(parent_node, '{DAV:}href').text = '/'.join(
+            (portal_url(), 'caldav-principal', self.context.getId()))
+
     @caldav_property('calendar-user-address-set', 'urn:ietf:params:xml:ns:caldav')
     @caldav_callback
     def calendar_user_address_set(self, parent_node):
