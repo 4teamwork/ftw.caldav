@@ -42,6 +42,18 @@ class UserCalDAVProperties(CalDAVPropertiesAdapter):
 
         etree.SubElement(parent_node, '{DAV:}href').text = url
 
+    @caldav_property('current-user-principal', 'DAV:')
+    @caldav_callback
+    def current_user_principal(self, parent_node):
+        """http://tools.ietf.org/html/rfc5397#section-3
+        Indicates a URL for the currently authenticated user's
+        principal resource on the server.
+        """
+        urltool = getToolByName(self.context, 'portal_url')
+        url = '/'.join((urltool(), 'caldav-principal', self.context.getId()))
+
+        etree.SubElement(parent_node, '{DAV:}href').text = url
+
     @caldav_property('calendar-user-address-set', 'urn:ietf:params:xml:ns:caldav')
     @caldav_callback
     def calendar_user_address_set(self, parent_node):

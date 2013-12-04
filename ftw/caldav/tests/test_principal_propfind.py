@@ -75,3 +75,20 @@ class TestPropfindOnPrincipal(TestCase):
                      '<href>mailto:test@user.com</href>',
                      '</calendar-user-address-set>')),
             propfind.property_xml('calendar-user-address-set'))
+
+    @browsing
+    def test_current_user_principal(self, browser):
+        # http://tools.ietf.org/html/rfc5397#section-3
+        req_body = propfind.make_propfind_request_body({
+                'DAV:': ['current-user-principal']})
+        browser.login().webdav('PROPFIND', view='caldav-principal/test_user_1_',
+                               data=req_body)
+        self.assertEquals('HTTP/1.1 200 OK',
+                          propfind.status_for_property('current-user-principal'))
+        url = '%s/caldav-principal/test_user_1_' % self.layer['portal'].portal_url()
+
+        self.assertEquals(
+            ''.join(('<current-user-principal>',
+                     '<href>%s</href>' % url,
+                     '</current-user-principal>')),
+            propfind.property_xml('current-user-principal'))

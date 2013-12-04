@@ -44,7 +44,6 @@ class TestPropfindRequestOnRoot(TestCase):
     @browsing
     def test_current_user_principal(self, browser):
         # http://tools.ietf.org/html/rfc5397#section-3
-        # "current-user-principal" is the URL of the user, which we dont have.
         req_body = propfind.make_propfind_request_body({
                 'DAV:': ['current-user-principal']})
         browser.login().webdav('PROPFIND', data=req_body)
