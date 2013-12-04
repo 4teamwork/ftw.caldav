@@ -1,5 +1,6 @@
 from Products.CMFCore.interfaces import IMemberData
 from Products.CMFCore.utils import getToolByName
+from ftw.caldav.interfaces import ICalendar
 from ftw.caldav.properties.adapter import CalDAVPropertiesAdapter
 from ftw.caldav.properties.adapter import caldav_callback
 from ftw.caldav.properties.adapter import caldav_property
@@ -25,3 +26,21 @@ class CalendarsCollectionProperties(CalDAVPropertiesAdapter):
         """http://tools.ietf.org/html/rfc4791#section-4.2
         """
         etree.SubElement(parent_node, '{DAV:}collection')
+
+
+class CalendarProperties(CalDAVPropertiesAdapter):
+    adapts(ICalendar, Interface)
+
+    def get_href(self):
+        return '/'.join((self.context.absolute_url(), 'caldav'))
+
+    @caldav_property('resourcetype', 'DAV:')
+    @caldav_callback
+    def resourcetype(self, parent_node):
+        """http://tools.ietf.org/html/rfc4791#section-4.2
+        """
+        etree.SubElement(parent_node, '{urn:ietf:params:xml:ns:caldav}calendar')
+
+    @caldav_property('displayname', 'DAV:')
+    def displayname(self):
+        return self.context.Title()

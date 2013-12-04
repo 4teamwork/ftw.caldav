@@ -1,5 +1,6 @@
 from ftw.testbrowser import browser
 from lxml import etree
+from zope.component.hooks import getSite
 
 
 PROPFIND_REQUEST_TEMPLATE = '''<?xml version="1.0" encoding="UTF-8"?>
@@ -33,6 +34,28 @@ def property_xml(property_name):
     prop = browser.css(property_name)
     assert len(prop) > 0, 'No property "%s" found in response.' % property_name
     return etree.tostring(prop.first.node)
+
+
+def propfind_data():
+    portal = getSite()
+    portal_url = portal.absolute_url()
+
+    data = {}
+    for response in browser.css('response'):
+        href = response.css('href').first.normalized_text().replace(portal_url, '...')
+        data[href] = response_data = {}
+
+        for propstat in response.css('propstat'):
+            prop_status = propstat.css('status').first.normalized_text()
+            response_data[prop_status] = prop_data = {}
+
+            for property in propstat.css('> prop > *'):
+                if len(property.css('>*')) > 0:
+                    prop_data[property.tag] = etree.tostring(property.node)
+                else:
+                    prop_data[property.tag] = property.normalized_text()
+
+    return data
 
 
 def make_propfind_request_body(properties):

@@ -3,9 +3,12 @@ from AccessControl import Unauthorized
 from AccessControl.Permissions import webdav_access
 from Products.CMFCore.utils import getToolByName
 from ftw.caldav.browser.helpers import authenticated
+from ftw.caldav.interfaces import ICalDAVProperties
+from ftw.caldav.interfaces import ICalendar
 from ftw.caldav.interfaces import IPROPFINDDocumentGenerator
 from ftw.caldav.properties.calendars import CalendarsCollectionProperties
 from zope.component import getAdapter
+from zope.component import getMultiAdapter
 from zope.interface import implements
 from zope.publisher.browser import BrowserView
 from zope.publisher.interfaces import IPublishTraverse
@@ -48,9 +51,17 @@ class CalendarsView(BrowserView):
     def PROPFIND(self, REQUEST, RESPONSE):
         """Retrieve properties of the current user."""
         member = self.getMember()
-        collection_provider = CalendarsCollectionProperties(member, self.request)
+        providers = [CalendarsCollectionProperties(member, self.request)]
+
+        catalog = getToolByName(self.context, 'portal_catalog')
+        query = {'object_provides': ICalendar.__identifier__}
+        for brain in  catalog(query):
+            calendar = brain.getObject()
+            providers.append(
+                getMultiAdapter((calendar, self.request), ICalDAVProperties))
+
         generator = getAdapter(self.request, IPROPFINDDocumentGenerator)
-        return generator.generate([collection_provider])
+        return generator.generate(providers)
 
     security.declarePublic('OPTIONS')
     @authenticated
