@@ -26,7 +26,7 @@ def property_value(property_name):
 def property_type(property_name):
     prop = browser.css(property_name)
     assert len(prop) > 0, 'No property "%s" found in response.' % property_name
-    return prop.first.css('>*').first.tag
+    return map(lambda node: node.tag, prop.first.css('>*'))
 
 
 def property_xml(property_name):
