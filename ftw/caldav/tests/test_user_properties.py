@@ -46,7 +46,7 @@ class TestUserPropertiesAdapter(TestCase):
         adapter = self.get_adapter()
         self.assertEquals(
             [{'name': 'calendar-home-set',
-              'namespace': 'DAV:',
+              'namespace': 'urn:ietf:params:xml:ns:caldav',
               'status_code': 200,
               'value': 'http://nohost/plone/caldav-calendars/%s' % TEST_USER_ID}],
 

@@ -30,7 +30,7 @@ class UserCalDAVProperties(CalDAVPropertiesAdapter):
         The principal should have a non-empty "displayname" property."""
         return self.context.getProperty('fullname') or self.context.getId()
 
-    @caldav_property('calendar-home-set', 'DAV:')
+    @caldav_property('calendar-home-set', 'urn:ietf:params:xml:ns:caldav')
     def calendar_home_set(self):
         """http://tools.ietf.org/html/rfc4791#section-6.2.1
         Identifies the URL of any WebDAV collections that contain

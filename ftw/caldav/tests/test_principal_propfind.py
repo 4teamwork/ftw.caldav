@@ -44,7 +44,7 @@ class TestPropfindOnPrincipal(TestCase):
         # The principal should have a non-empty "displayname" property.
 
         req_body = propfind.make_propfind_request_body({
-                'DAV:': ['calendar-home-set']})
+                'urn:ietf:params:xml:ns:caldav': ['calendar-home-set']})
         browser.login().webdav('PROPFIND', view='caldav-principal/test_user_1_',
                                data=req_body)
         self.assertEquals('HTTP/1.1 200 OK',
