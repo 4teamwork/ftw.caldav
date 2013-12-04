@@ -113,6 +113,9 @@ class TestPropfindRequestOnRoot(TestCase):
             ''.join(('<calendar-user-address-set'
                      ' xmlns:n="urn:ietf:params:xml:ns:caldav">',
                      '<href xmlns:n="DAV:">mailto:test@user.com</href>',
+                     '<href xmlns:n="DAV:">userid:test_user_1_</href>',
+                     '<href xmlns:n="DAV:">/plone/caldav-principals/test_user_1_' + \
+                         '</href>',
                      '</calendar-user-address-set>')),
             propfind.property_xml('calendar-user-address-set'))
 

@@ -29,9 +29,14 @@ class CalDAVProperties(DAVProperties):
         mtool = getToolByName(self, 'portal_membership')
         member = mtool.getAuthenticatedMember()
 
-        if member.getProperty('email'):
-            value = 'mailto:%s' % member.getProperty('email')
-        else:
-            value = '/'.join((portal_url_prefix(), 'caldav-calendars', member.getId()))
+        result = []
+        href = '<d:href xmlns:n="DAV:">%s</d:href>'
 
-        return '<d:href xmlns:n="DAV:">%s</d:href>' % value
+        if member.getProperty('email'):
+            result.append(href % 'mailto:%s' % member.getProperty('email'))
+
+        result.append(href % 'userid:%s' % member.getId())
+        result.append(href % '/'.join(
+                (portal_url_prefix(), 'caldav-principals', member.getId())))
+
+        return ''.join(result)
