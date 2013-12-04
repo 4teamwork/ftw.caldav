@@ -52,3 +52,14 @@ class PrincipalView(BrowserView):
         provider = getMultiAdapter((member, self.request), ICalDAVProperties)
         generator = getAdapter(self.request, IPROPFINDDocumentGenerator)
         return generator.generate(provider)
+
+    security.declarePublic('OPTIONS')
+    @authenticated
+    def OPTIONS(self, REQUEST, RESPONSE):
+        """Retrieve OPTIONS.
+        """
+        RESPONSE.setHeader('Allow', ', '.join(self.context.__http_methods__))
+        RESPONSE.setHeader('Content-Length', 0)
+        RESPONSE.setHeader('DAV', '1, 2, calendar-access')
+        RESPONSE.setStatus(200)
+        return RESPONSE
