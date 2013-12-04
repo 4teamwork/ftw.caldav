@@ -9,4 +9,11 @@
         permission="zope.Public"
         />
 
+    <browser:page
+        name="caldav-calendars"
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+        class=".calendars.CalendarsView"
+        permission="zope.Public"
+        />
+
 </configure>
