@@ -8,6 +8,15 @@
 
     <include package="collective.monkeypatcher" />
     <monkey:patch
+        description="DAV OPTIONS: promote calendar-access support."
+        class="webdav.Resource.Resource"
+        original="OPTIONS"
+        replacement=".patches.OPTIONS"
+        preserveOriginal="true"
+        preservedoc="true"
+        />
+
+    <monkey:patch
         description="DAVProperties: support properties with hyphens."
         class="OFS.PropertySheets.DAVProperties"
         original="getProperty"

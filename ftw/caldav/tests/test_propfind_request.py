@@ -9,17 +9,27 @@ class TestPropfindRequestOnRoot(TestCase):
     layer = CALDAV_ZSERVER_FUNCTIONAL_TESTING
 
     @browsing
+    def test_resourcetype_is_collection(self, browser):
+        req_body = propfind.make_propfind_request_body({
+                'DAV:': ['resourcetype']})
+        browser.login().webdav('PROPFIND', data=req_body)
+        self.assertEquals('HTTP/1.1 200 OK',
+                          propfind.status_for_property('resourcetype'))
+        self.assertEquals('collection',
+                          propfind.property_type('resourcetype'))
+
+    @browsing
     def test_current_user_principal(self, browser):
         # http://tools.ietf.org/html/rfc5397#section-3
         # "current-user-principal" is the URL of the user, which we dont have.
-
         req_body = propfind.make_propfind_request_body({
                 'DAV:': ['current-user-principal']})
-        browser.login().webdav('PROPFIND', view='calendars', data=req_body)
+        browser.login().webdav('PROPFIND', data=req_body)
         self.assertEquals('HTTP/1.1 200 OK',
                           propfind.status_for_property('current-user-principal'))
-        self.assertEquals('%s/user-calendars' % self.layer['portal'].portal_url(),
-                          propfind.property_value('current-user-principal'))
+        self.assertEquals(
+            '%s/caldav-principal/test_user_1_' % self.layer['portal'].portal_url(),
+            propfind.property_value('current-user-principal'))
 
     @browsing
     def test_displayname(self, browser):
@@ -27,7 +37,7 @@ class TestPropfindRequestOnRoot(TestCase):
 
         req_body = propfind.make_propfind_request_body({
                 'DAV:': ['displayname']})
-        browser.login().webdav('PROPFIND', view='calendars', data=req_body)
+        browser.login().webdav('PROPFIND', data=req_body)
         self.assertEquals('HTTP/1.1 200 OK',
                           propfind.status_for_property('displayname'))
         self.assertEquals('Plone site',
@@ -41,7 +51,7 @@ class TestPropfindRequestOnRoot(TestCase):
 
         req_body = propfind.make_propfind_request_body({
                 'DAV:': ['supported-report-set']})
-        browser.login().webdav('PROPFIND', view='calendars', data=req_body)
+        browser.login().webdav('PROPFIND', data=req_body)
         self.assertEquals('HTTP/1.1 404 Not Found',
                           propfind.status_for_property('supported-report-set'))
 
@@ -53,7 +63,7 @@ class TestPropfindRequestOnRoot(TestCase):
 
         req_body = propfind.make_propfind_request_body({
                 'urn:ietf:params:xml:ns:caldav': ['calendar-home-set']})
-        browser.login().webdav('PROPFIND', view='calendars', data=req_body)
+        browser.login().webdav('PROPFIND', data=req_body)
         self.assertEquals('HTTP/1.1 404 Not Found',
                           propfind.status_for_property('calendar-home-set'))
 
@@ -65,7 +75,7 @@ class TestPropfindRequestOnRoot(TestCase):
 
         req_body = propfind.make_propfind_request_body({
                 'urn:ietf:params:xml:ns:caldav': ['calendar-user-address-set']})
-        browser.login().webdav('PROPFIND', view='calendars', data=req_body)
+        browser.login().webdav('PROPFIND', data=req_body)
         self.assertEquals('HTTP/1.1 404 Not Found',
                           propfind.status_for_property('calendar-user-address-set'))
 
@@ -78,7 +88,7 @@ class TestPropfindRequestOnRoot(TestCase):
 
         req_body = propfind.make_propfind_request_body({
                 'urn:ietf:params:xml:ns:caldav': ['schedule-inbox-URL']})
-        browser.login().webdav('PROPFIND', view='calendars', data=req_body)
+        browser.login().webdav('PROPFIND', data=req_body)
         self.assertEquals('HTTP/1.1 404 Not Found',
                           propfind.status_for_property('schedule-inbox-URL'))
 
@@ -91,7 +101,7 @@ class TestPropfindRequestOnRoot(TestCase):
 
         req_body = propfind.make_propfind_request_body({
                 'urn:ietf:params:xml:ns:caldav': ['schedule-outbox-URL']})
-        browser.login().webdav('PROPFIND', view='calendars', data=req_body)
+        browser.login().webdav('PROPFIND', data=req_body)
         self.assertEquals('HTTP/1.1 404 Not Found',
                           propfind.status_for_property('schedule-outbox-URL'))
 
@@ -102,7 +112,7 @@ class TestPropfindRequestOnRoot(TestCase):
 
         req_body = propfind.make_propfind_request_body({
                 'http://calendarserver.org/ns/': ['dropbox-home-URL']})
-        browser.login().webdav('PROPFIND', view='calendars', data=req_body)
+        browser.login().webdav('PROPFIND', data=req_body)
         self.assertEquals('HTTP/1.1 404 Not Found',
                           propfind.status_for_property('dropbox-home-URL'))
 
@@ -113,7 +123,7 @@ class TestPropfindRequestOnRoot(TestCase):
 
         req_body = propfind.make_propfind_request_body({
                 'http://calendarserver.org/ns/': ['email-address-set']})
-        browser.login().webdav('PROPFIND', view='calendars', data=req_body)
+        browser.login().webdav('PROPFIND', data=req_body)
         self.assertEquals('HTTP/1.1 404 Not Found',
                           propfind.status_for_property('email-address-set'))
 
@@ -124,6 +134,6 @@ class TestPropfindRequestOnRoot(TestCase):
 
         req_body = propfind.make_propfind_request_body({
                 'http://calendarserver.org/ns/': ['notification-URL']})
-        browser.login().webdav('PROPFIND', view='calendars', data=req_body)
+        browser.login().webdav('PROPFIND', data=req_body)
         self.assertEquals('HTTP/1.1 404 Not Found',
                           propfind.status_for_property('notification-URL'))

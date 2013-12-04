@@ -3,16 +3,9 @@
     xmlns:browser="http://namespaces.zope.org/browser">
 
     <browser:page
-        name="calendars"
+        name="caldav-principal"
         for="Products.CMFPlone.interfaces.IPloneSiteRoot"
-        class=".calendars.PloneCalendarsView"
-        permission="zope.Public"
-        />
-
-    <browser:page
-        name="user-calendars"
-        for="Products.CMFPlone.interfaces.IPloneSiteRoot"
-        class=".calendars.UserCalendarsView"
+        class=".principal.PrincipalView"
         permission="zope.Public"
         />
 

@@ -9,7 +9,7 @@ class TestOptionsRequestOnCaldavView(TestCase):
 
     @browsing
     def test_dav_calendar_access_option_promoted(self, browser):
-        browser.webdav('OPTIONS', view='calendars')
+        browser.webdav('OPTIONS')
         self.assertEquals('calendar-access, 1,2',
                           browser.response.headers.get('DAV'),
                           '"DAV" option does not provide calendar-access correctly.')
