@@ -5,6 +5,7 @@
 
 
     <include package=".browser" />
+    <include package=".properties" />
 
     <include package="collective.monkeypatcher" />
     <monkey:patch

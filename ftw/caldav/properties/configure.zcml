@@ -1,0 +1,7 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    i18n_domain="ftw.caldav">
+
+    <adapter factory=".user.UserCalDAVProperties" />
+
+</configure>
