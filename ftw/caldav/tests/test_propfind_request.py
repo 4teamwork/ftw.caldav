@@ -32,9 +32,10 @@ class TestPropfindRequestOnRoot(TestCase):
         self.assertEquals('HTTP/1.1 200 OK',
                           propfind.status_for_property('principal-URL'))
 
+        url = '%s/caldav-principal/test_user_1_' % self.layer['portal'].portal_url()
         self.assertEquals(
             ''.join(('<principal-url xmlns:n="DAV:">',
-                     '<href xmlns:n="DAV:">/plone/caldav-principal/test_user_1_</href>',
+                     '<href xmlns:n="DAV:">%s</href>' % url,
                      '</principal-url>')),
             propfind.property_xml('principal-URL'))
 
@@ -47,9 +48,10 @@ class TestPropfindRequestOnRoot(TestCase):
         self.assertEquals('HTTP/1.1 200 OK',
                           propfind.status_for_property('current-user-principal'))
 
+        url = '%s/caldav-principal/test_user_1_' % self.layer['portal'].portal_url()
         self.assertEquals(
             ''.join(('<current-user-principal xmlns:n="DAV:">',
-                     '<href xmlns:n="DAV:">/plone/caldav-principal/test_user_1_</href>',
+                     '<href xmlns:n="DAV:">%s</href>' % url,
                      '</current-user-principal>')),
             propfind.property_xml('current-user-principal'))
 
@@ -109,13 +111,15 @@ class TestPropfindRequestOnRoot(TestCase):
         self.assertEquals('HTTP/1.1 200 OK',
                           propfind.status_for_property('calendar-user-address-set'))
 
+        userpath = '/caldav-principals/test_user_1_'
+        userurl = ''.join((self.layer['portal'].portal_url(), userpath))
         self.assertEquals(
             ''.join(('<calendar-user-address-set'
                      ' xmlns:n="urn:ietf:params:xml:ns:caldav">',
                      '<href xmlns:n="DAV:">mailto:test@user.com</href>',
                      '<href xmlns:n="DAV:">userid:test_user_1_</href>',
-                     '<href xmlns:n="DAV:">/plone/caldav-principals/test_user_1_' + \
-                         '</href>',
+                     '<href xmlns:n="DAV:">/plone%s</href>' % userpath,
+                     '<href xmlns:n="DAV:">%s</href>' % userurl,
                      '</calendar-user-address-set>')),
             propfind.property_xml('calendar-user-address-set'))
 

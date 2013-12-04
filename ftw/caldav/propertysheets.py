@@ -39,4 +39,8 @@ class CalDAVProperties(DAVProperties):
         result.append(href % '/'.join(
                 (portal_url_prefix(), 'caldav-principals', member.getId())))
 
+        portal_url = getToolByName(self, 'portal_url')
+        result.append(href % '/'.join(
+                (portal_url(), 'caldav-principals', member.getId())))
+
         return ''.join(result)

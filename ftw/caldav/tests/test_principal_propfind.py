@@ -75,6 +75,8 @@ class TestPropfindOnPrincipal(TestCase):
                      '<href>mailto:test@user.com</href>',
                      '<href>userid:test_user_1_</href>',
                      '<href>/plone/caldav-principal/test_user_1_</href>',
+                     '<href>%s/caldav-principal/test_user_1_</href>' % (
+                        self.layer['portal'].portal_url()),
                      '</calendar-user-address-set>')),
             propfind.property_xml('calendar-user-address-set'))
 
@@ -87,7 +89,7 @@ class TestPropfindOnPrincipal(TestCase):
                                data=req_body)
         self.assertEquals('HTTP/1.1 200 OK',
                           propfind.status_for_property('current-user-principal'))
-        url = '/plone/caldav-principal/test_user_1_'
+        url = '%s/caldav-principal/test_user_1_' % self.layer['portal'].portal_url()
 
         self.assertEquals(
             ''.join(('<current-user-principal>',

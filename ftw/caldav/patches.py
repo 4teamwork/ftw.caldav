@@ -1,6 +1,5 @@
 from OFS.PropertySheets import DAVProperties
 from Products.CMFCore.utils import getToolByName
-from ftw.caldav.utils import portal_url_prefix
 
 
 def OPTIONS(self, REQUEST, RESPONSE):
@@ -19,7 +18,8 @@ def DAVProperties_getProperty(self, id, default=None):
 def dav__current_user_principal(self):
     mtool = getToolByName(self, 'portal_membership')
     member = mtool.getAuthenticatedMember()
-    url = '/'.join((portal_url_prefix(), 'caldav-principal', member.getId()))
+    portal_url = getToolByName(self, 'portal_url')
+    url = '/'.join((portal_url(), 'caldav-principal', member.getId()))
     return '<d:href xmlns:n="DAV:">%s</d:href>' % url
 
 
