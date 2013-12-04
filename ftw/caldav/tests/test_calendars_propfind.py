@@ -18,7 +18,7 @@ class TestPropfindOnPrincipal(TestCase):
                                data=req_body)
         self.assertEquals('HTTP/1.1 200 OK',
                           propfind.status_for_property('resourcetype'))
-        self.assertEquals(['collection', 'calendar'],
+        self.assertEquals(['collection'],
                           propfind.property_type('resourcetype'))
 
     # @browsing

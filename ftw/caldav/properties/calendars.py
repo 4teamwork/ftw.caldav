@@ -25,4 +25,3 @@ class CalendarsCollectionProperties(CalDAVPropertiesAdapter):
         """http://tools.ietf.org/html/rfc4791#section-4.2
         """
         etree.SubElement(parent_node, '{DAV:}collection')
-        etree.SubElement(parent_node, '{urn:ietf:params:xml:ns:caldav}calendar')
