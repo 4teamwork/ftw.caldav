@@ -3,10 +3,13 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:i18n="http://namespaces.zope.org/i18n"
     xmlns:monkey="http://namespaces.plone.org/monkey"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
     i18n_domain="ftw.caldav">
 
     <include package=".browser" />
     <include package=".properties" />
+    <include file="permissions.zcml" />
     <include file="patches.zcml" />
 
     <genericsetup:registerProfile
@@ -23,5 +26,26 @@
         description=""
         handler="ftw.caldav.setuphandlers.install_caldav"
         />
+
+    <configure zcml:condition="installed plone.app.dexterity">
+        <include package="plone.app.dexterity" />
+
+        <plone:behavior
+            title="Calendar container"
+            description="Enables CalDAV support on a calendaring container."
+            provides="ftw.caldav.interfaces.ICalendar"
+            for="plone.dexterity.interfaces.IDexterityContent"
+            />
+
+
+        <genericsetup:registerProfile
+            name="calendar"
+            title="ftw.caldav: Calendar content type"
+            directory="profiles/calendar"
+            description="An example calendar content type."
+            provides="Products.GenericSetup.interfaces.EXTENSION"
+            />
+
+    </configure>
 
 </configure>

@@ -1,0 +1,10 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    i18n_domain="ftw.topics">
+
+    <permission
+        id="ftw.caldav.AddCalendar"
+        title="ftw.caldav: Add Calendar"
+        />
+
+</configure>

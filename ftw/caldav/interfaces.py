@@ -1,6 +1,11 @@
 from zope.interface import Interface
 
 
+class ICalendar(Interface):
+    """Marker interface for containers containing events.
+    """
+
+
 class ICalDAVProperties(Interface):
     """An adapter providing caldav properties.
     """
