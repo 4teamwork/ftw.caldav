@@ -6,11 +6,22 @@ from zope.interface import implements
 
 def caldav_property(name, namespace):
     def wrapper(func):
-        setattr(func, '_caldav_property', {
+        if getattr(func, '_caldav_property', None) is None:
+            func._caldav_property = {}
+
+        func._caldav_property.update({
                 'name': name,
                 'namespace': namespace})
         return func
     return wrapper
+
+
+def caldav_callback(func):
+    if getattr(func, '_caldav_property', None) is None:
+        func._caldav_property = {}
+
+    func._caldav_property['callback'] = True
+    return func
 
 
 class CalDAVPropertiesAdapter(object):
@@ -28,10 +39,17 @@ class CalDAVPropertiesAdapter(object):
             if names is not None and property_info['name'] not in names:
                 continue
 
-            result.append({'name': property_info['name'],
-                           'namespace': property_info['namespace'],
-                           'status_code': 200,
-                           'value': property_info['method']()})
+            if property_info['is_callback']:
+                result.append({'name': property_info['name'],
+                               'namespace': property_info['namespace'],
+                               'status_code': 200,
+                               'callback': property_info['method']})
+
+            else:
+                result.append({'name': property_info['name'],
+                               'namespace': property_info['namespace'],
+                               'status_code': 200,
+                               'value': property_info['method']()})
 
         return result
 
@@ -44,9 +62,11 @@ class CalDAVPropertiesAdapter(object):
                 continue
 
             property_settings = method._caldav_property
-            properties.append({'name': property_settings['name'],
-                               'namespace': property_settings['namespace'],
-                               'method': method})
+            properties.append(
+                {'name': property_settings['name'],
+                 'namespace': property_settings['namespace'],
+                 'method': method,
+                 'is_callback': property_settings.get('callback', False)})
 
         properties.sort(key=lambda info: info.get('name'))
         return properties
