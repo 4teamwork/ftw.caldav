@@ -16,7 +16,8 @@ class TestPropfindOnPrincipal(TestCase):
 
         req_body = propfind.make_propfind_request_body({
                 'DAV:': ['resourcetype']})
-        browser.login().webdav('PROPFIND', view='caldav-principal', data=req_body)
+        browser.login().webdav('PROPFIND', view='caldav-principal/test_user_1_',
+                               data=req_body)
         self.assertEquals('HTTP/1.1 200 OK',
                           propfind.status_for_property('resourcetype'))
         self.assertEquals('principal',
@@ -29,7 +30,8 @@ class TestPropfindOnPrincipal(TestCase):
 
         req_body = propfind.make_propfind_request_body({
                 'DAV:': ['displayname']})
-        browser.login().webdav('PROPFIND', view='caldav-principal', data=req_body)
+        browser.login().webdav('PROPFIND', view='caldav-principal/test_user_1_',
+                               data=req_body)
         self.assertEquals('HTTP/1.1 200 OK',
                           propfind.status_for_property('displayname'))
         self.assertEquals('Test User',

@@ -1,7 +1,8 @@
 
-def _traversable(method):
-    # Decorator for making webdav methods traversable by setting the __roles__
-    # to the default empty string.
-    # Otherwise the Zope traversal would not allow to call it.
-    method.__roles__ = ''
+def authenticated(method):
+    """Protect a traversable method to require the visitor to be authenticated.
+    This sets the method's __roles__. Without setting it the method is not
+    traversable.
+    """
+    method.__roles__ = ('Authenticated', )
     return method
