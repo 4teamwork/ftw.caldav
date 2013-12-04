@@ -19,6 +19,26 @@ class TestPropfindRequestOnRoot(TestCase):
                           propfind.property_type('resourcetype'))
 
     @browsing
+    def test_principal_URL(self, browser):
+        # http://tools.ietf.org/html/rfc3744#section-4.2
+        # This protected property contains the URL that MUST be used to identify
+        # this principal in an ACL request.
+        req_body = propfind.make_propfind_request_body({
+                'DAV:': ['principal-URL']})
+        browser.login().webdav('PROPFIND', data=req_body)
+        self.assertEquals('HTTP/1.1 200 OK',
+                          propfind.status_for_property('principal-URL'))
+        url = '%s/caldav-principal/test_user_1_' % self.layer['portal'].portal_url()
+
+        self.assertEquals(
+            ''.join(('<principal-url xmlns:n="DAV:">',
+                     '<href xmlns:n="DAV:">',
+                     url,
+                     '</href>',
+                     '</principal-url>')),
+            propfind.property_xml('principal-URL'))
+
+    @browsing
     def test_current_user_principal(self, browser):
         # http://tools.ietf.org/html/rfc5397#section-3
         # "current-user-principal" is the URL of the user, which we dont have.

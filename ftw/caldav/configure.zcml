@@ -48,6 +48,14 @@
         ignoreOriginal="true"
         />
 
+    <monkey:patch
+        description="Extend Zope WebDAV with CalDAV 'current-user-principal' property."
+        class="OFS.PropertySheets.DAVProperties"
+        original="dav__principal_URL"
+        replacement=".patches.dav__principal_URL"
+        ignoreOriginal="true"
+        />
+
 
 
 </configure>

@@ -25,3 +25,13 @@ def dav__current_user_principal(self):
 
 DAVProperties.pm = DAVProperties.pm + ({'id': 'current-user-principal', 'mode': 'r',
                                         'meta': {'__xml_attrs__': {}}},)
+
+
+def dav__principal_URL(self):
+    """http://tools.ietf.org/html/rfc3744#section-4.2
+    """
+    return self.dav__current_user_principal()
+
+
+DAVProperties.pm = DAVProperties.pm + ({'id': 'principal-URL', 'mode': 'r',
+                                        'meta': {'__xml_attrs__': {}}},)
