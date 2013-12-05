@@ -7,7 +7,7 @@ from plone.app.testing import PLONE_FIXTURE
 from plone.app.testing import PLONE_ZSERVER
 from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import applyProfile
-from plone.dexterity.fti import DexterityFTI
+from plone.testing import z2
 from zope.configuration import xmlconfig
 import  ftw.caldav.tests.builders
 
@@ -27,9 +27,17 @@ class CaldavLayer(PloneSandboxLayer):
                        plone.app.dexterity,
                        context=configurationContext)
 
+        import plone.app.event
+        xmlconfig.file('configure.zcml',
+                       plone.app.event,
+                       context=configurationContext)
+
+        z2.installProduct(app, 'Products.DateRecurringIndex')
+
     def setUpPloneSite(self, portal):
         applyProfile(portal, 'ftw.caldav:default')
         applyProfile(portal, 'ftw.caldav:calendar')
+        applyProfile(portal, 'plone.app.event.dx:default')
 
 
 CALDAV_FIXTURE = CaldavLayer()

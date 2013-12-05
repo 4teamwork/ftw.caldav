@@ -5,5 +5,6 @@
     <adapter factory=".user.UserCalDAVProperties" />
     <adapter factory=".generator.PROPFINDDocumentGenerator" />
     <adapter factory=".calendars.CalendarProperties" />
+    <adapter factory=".event.EventProperties" />
 
 </configure>

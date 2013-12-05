@@ -23,4 +23,11 @@
         permission="zope.Public"
         />
 
+    <browser:page
+        name="caldav"
+        for="plone.event.interfaces.IEvent"
+        class=".event.EventView"
+        permission="zope.Public"
+        />
+
 </configure>
