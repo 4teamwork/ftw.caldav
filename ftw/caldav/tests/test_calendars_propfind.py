@@ -155,10 +155,33 @@ class TestCalendarProperties(TestCase):
 
     @browsing
     def test_getctag_changes_when_object_is_added(self, browser):
-        # XXX implement when we can use events with a custom interface
-        pass
+        self.propfind(browser, 'http://calendarserver.org/ns/', 'getctag')
+        self.assertEquals('HTTP/1.1 200 OK',
+                          propfind.status_for_property('getctag'))
+        initial_value = propfind.property_value('getctag')
+
+        transaction.begin()
+        create(Builder('event').within(self.calendar))
+        transaction.commit()
+
+        self.propfind(browser, 'http://calendarserver.org/ns/', 'getctag')
+        self.assertNotEquals(initial_value, propfind.property_value('getctag'),
+                             'getctag should have changed when adding an object.')
 
     @browsing
     def test_getctag_changes_when_contained_object_changes(self, browser):
-        # XXX implement when we can use events with a custom interface
-        pass
+        event = create(Builder('event').within(self.calendar))
+        self.propfind(browser, 'http://calendarserver.org/ns/', 'getctag')
+        self.assertEquals('HTTP/1.1 200 OK',
+                          propfind.status_for_property('getctag'))
+        initial_value = propfind.property_value('getctag')
+
+        transaction.begin()
+        event.setDescription('A new description')
+        notify(ObjectModifiedEvent(event))
+        transaction.commit()
+
+        self.propfind(browser, 'http://calendarserver.org/ns/', 'getctag')
+        self.assertNotEquals(initial_value, propfind.property_value('getctag'),
+                             'getctag should have changed when contained object'
+                             'was changed.')

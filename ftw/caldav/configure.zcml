@@ -12,9 +12,10 @@
     <include file="permissions.zcml" />
     <include file="patches.zcml" />
 
-
+    <!-- XXX we need a way to only trigger the event on relevant objects
+         within the calendar and on the calendar -->
     <subscriber
-        for="ftw.caldav.interfaces.ICalendar
+        for="*
              zope.lifecycleevent.interfaces.IObjectModifiedEvent"
         handler=".ctag.update_calendar_ctag_handler"
         />

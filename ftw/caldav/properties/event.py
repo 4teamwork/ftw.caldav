@@ -15,9 +15,7 @@ class EventProperties(CalDAVPropertiesAdapter):
     adapts(IEvent, Interface)
 
     def get_href(self):
-        urltool = getToolByName(self.context, 'portal_url')
-        return '/'.join((urltool(), 'caldav', self.context.getId()))
-
+        return '/'.join((self.context.absolute_url(), 'caldav'))
 
     @caldav_property('displayname', 'DAV:')
     def displayname(self):
