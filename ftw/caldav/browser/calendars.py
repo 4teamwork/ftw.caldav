@@ -7,6 +7,7 @@ from ftw.caldav.interfaces import ICalDAVProperties
 from ftw.caldav.interfaces import ICalendar
 from ftw.caldav.interfaces import IPROPFINDDocumentGenerator
 from ftw.caldav.properties.calendars import CalendarsCollectionProperties
+from ftw.caldav.utils import event_interface_identifiers
 from zope.component import getAdapter
 from zope.component import getMultiAdapter
 from zope.interface import implements
@@ -83,9 +84,18 @@ class CalendarView(BrowserView):
     @authenticated
     def PROPFIND(self, REQUEST, RESPONSE):
         """Retrieve properties of the current user."""
-        provider = getMultiAdapter((self.context, self.request), ICalDAVProperties)
+        providers = [getMultiAdapter((self.context, self.request), ICalDAVProperties)]
         generator = getAdapter(self.request, IPROPFINDDocumentGenerator)
-        return generator.generate([provider])
+
+        if REQUEST.getHeader('Depth', 'infinity') != '0':
+            catalog = getToolByName(self.context, 'portal_catalog')
+            query = {'object_provides': event_interface_identifiers()}
+            for brain in  catalog(query):
+                calendar = brain.getObject()
+                providers.append(
+                    getMultiAdapter((calendar, self.request), ICalDAVProperties))
+
+        return generator.generate(providers)
 
     security.declarePublic('OPTIONS')
     @authenticated

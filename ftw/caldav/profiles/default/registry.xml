@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<registry>
+
+    <record name="ftw.caldav.event_interfaces">
+        <field type="plone.registry.field.Tuple">
+            <title>Interfaces for events supporting caldav.</title>
+            <required>True</required>
+            <value_type type="plone.registry.field.TextLine" />
+        </field>
+        <value>
+            <element>plone.event.interfaces.IEvent</element>
+        </value>
+    </record>
+
+</registry>

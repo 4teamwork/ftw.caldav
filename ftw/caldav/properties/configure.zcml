@@ -1,10 +1,14 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
     i18n_domain="ftw.caldav">
 
     <adapter factory=".user.UserCalDAVProperties" />
     <adapter factory=".generator.PROPFINDDocumentGenerator" />
     <adapter factory=".calendars.CalendarProperties" />
-    <adapter factory=".event.EventProperties" />
+
+    <configure zcml:condition="installed plone.app.event">
+        <adapter factory=".event.EventProperties" />
+    </configure>
 
 </configure>

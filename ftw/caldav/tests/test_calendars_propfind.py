@@ -63,10 +63,10 @@ class TestCalendarProperties(TestCase):
             .titled(u'First Calendar')
             .having(description=u'The most important calendar.'))
 
-    def propfind(self, browser, namespace, name):
+    def propfind(self, browser, namespace, name, headers=None):
         req_body = propfind.make_propfind_request_body({namespace: [name]})
         browser.login().webdav('PROPFIND', self.calendar, view='caldav',
-                               data=req_body)
+                               data=req_body, headers=headers)
 
     @browsing
     def test_resourcetype_is_calendar(self, browser):
@@ -185,3 +185,59 @@ class TestCalendarProperties(TestCase):
         self.assertNotEquals(initial_value, propfind.property_value('getctag'),
                              'getctag should have changed when contained object'
                              'was changed.')
+
+    @browsing
+    def test_events_are_listed(self, browser):
+        create(Builder('event').titled(u'A Meeting').within(self.calendar))
+        self.propfind(browser, 'DAV:', 'displayname')
+
+        self.maxDiff = None
+        self.assertEquals(
+            {'.../first-calendar/caldav':
+                 {'HTTP/1.1 200 OK':
+                      {'displayname': 'First Calendar'}},
+
+             '.../first-calendar/a-meeting/caldav':
+                 {'HTTP/1.1 200 OK':
+                      {'displayname': 'A Meeting'}}},
+
+            propfind.propfind_data())
+
+    @browsing
+    def test_Depth_header_is_implemented(self, browser):
+        create(Builder('event').titled(u'A Meeting').within(self.calendar))
+        self.maxDiff = None
+
+        self.propfind(browser, 'DAV:', 'displayname', headers={'Depth': '0'})
+        self.assertEquals(
+            {'.../first-calendar/caldav':
+                 {'HTTP/1.1 200 OK':
+                      {'displayname': 'First Calendar'}}},
+            propfind.propfind_data(),
+            'Expected no children with request header Depth: 0')
+
+        self.propfind(browser, 'DAV:', 'displayname', headers={'Depth': '1'})
+        self.assertEquals(
+            {'.../first-calendar/caldav':
+                 {'HTTP/1.1 200 OK':
+                      {'displayname': 'First Calendar'}},
+
+             '.../first-calendar/a-meeting/caldav':
+                 {'HTTP/1.1 200 OK':
+                      {'displayname': 'A Meeting'}}},
+
+            propfind.propfind_data(),
+            'Expected children with request header Depth: 1')
+
+        self.propfind(browser, 'DAV:', 'displayname', headers={'Depth': 'infinity'})
+        self.assertEquals(
+            {'.../first-calendar/caldav':
+                 {'HTTP/1.1 200 OK':
+                      {'displayname': 'First Calendar'}},
+
+             '.../first-calendar/a-meeting/caldav':
+                 {'HTTP/1.1 200 OK':
+                      {'displayname': 'A Meeting'}}},
+
+            propfind.propfind_data(),
+            'Expected children with request header Depth: infinity')

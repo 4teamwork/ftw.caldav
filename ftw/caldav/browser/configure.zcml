@@ -1,6 +1,8 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
-    xmlns:browser="http://namespaces.zope.org/browser">
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="ftw.caldav">
 
     <browser:page
         name="caldav-principal"
@@ -23,11 +25,13 @@
         permission="zope.Public"
         />
 
-    <browser:page
-        name="caldav"
-        for="plone.event.interfaces.IEvent"
-        class=".event.EventView"
-        permission="zope.Public"
-        />
+    <configure zcml:condition="installed plone.app.event">
+        <browser:page
+            name="caldav"
+            for="plone.event.interfaces.IEvent"
+            class=".event.EventView"
+            permission="zope.Public"
+            />
+    </configure>
 
 </configure>
