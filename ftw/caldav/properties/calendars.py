@@ -73,6 +73,14 @@ class CalendarProperties(CalDAVPropertiesAdapter):
         """
         return self.context.Description()
 
+    @caldav_property('supported-calendar-component-set',
+                     'urn:ietf:params:xml:ns:caldav')
+    @caldav_callback
+    def supperted_calendar_component_set(self, parent_node):
+        """http://tools.ietf.org/html/rfc4791#section-5.2.3
+        """
+        etree.SubElement(parent_node, '{DAV:}comp', {'name': 'VEVENT'})
+
     @caldav_property('getctag', 'http://calendarserver.org/ns/')
     def getctag(self):
         """http://tinyurl.com/oz8t32w

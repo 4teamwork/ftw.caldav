@@ -114,6 +114,19 @@ class TestCalendarProperties(TestCase):
                           propfind.property_value('calendar-description'))
 
     @browsing
+    def test_supported_calendar_component_set(self, browser):
+        propname = 'supported-calendar-component-set'
+        self.propfind(browser, 'urn:ietf:params:xml:ns:caldav', propname)
+        self.assertEquals('HTTP/1.1 200 OK',
+                          propfind.status_for_property(propname))
+
+        self.assertEquals(
+            ''.join(('<supported-calendar-component-set>',
+                     '<comp name="VEVENT"/>',
+                     '</supported-calendar-component-set>')),
+            propfind.property_xml(propname))
+
+    @browsing
     def test_getctag_does_not_change_when_nothing_changed(self, browser):
         self.propfind(browser, 'http://calendarserver.org/ns/', 'getctag')
         self.assertEquals('HTTP/1.1 200 OK',
