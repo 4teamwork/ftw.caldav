@@ -67,6 +67,13 @@ class CalendarProperties(CalDAVPropertiesAdapter):
         etree.SubElement(parent_node, '{DAV:}href').text = '/'.join(
             (portal_url(), 'caldav-principal', owner_id))
 
+    @caldav_property('getcontenttype', 'DAV:')
+    def getcontenttype(self):
+        """http://tools.ietf.org/html/rfc2518#section-13.5
+        """
+        return 'text/calendar; component=vevent'
+
+
     @caldav_property('calendar-description', 'urn:ietf:params:xml:ns:caldav')
     def calendar_description(self):
         """http://tools.ietf.org/html/rfc4791#section-5.2.1

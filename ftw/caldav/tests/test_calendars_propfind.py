@@ -107,6 +107,14 @@ class TestCalendarProperties(TestCase):
             propfind.property_xml('owner'))
 
     @browsing
+    def test_getcontenttype(self, browser):
+        self.propfind(browser, 'DAV:', 'getcontenttype')
+        self.assertEquals('HTTP/1.1 200 OK',
+                          propfind.status_for_property('getcontenttype'))
+        self.assertEquals('text/calendar; component=vevent',
+                          propfind.property_value('getcontenttype'))
+
+    @browsing
     def test_calendar_description(self, browser):
         self.propfind(browser, 'urn:ietf:params:xml:ns:caldav', 'calendar-description')
         self.assertEquals('HTTP/1.1 200 OK',
