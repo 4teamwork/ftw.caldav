@@ -5,9 +5,11 @@ from Products.CMFCore.utils import getToolByName
 from ftw.caldav.browser.helpers import authenticated
 from ftw.caldav.interfaces import ICalDAVProperties
 from ftw.caldav.interfaces import ICalendar
+from ftw.caldav.interfaces import IDAVReport
 from ftw.caldav.interfaces import IPROPFINDDocumentGenerator
 from ftw.caldav.properties.calendars import CalendarsCollectionProperties
 from ftw.caldav.utils import event_interface_identifiers
+from lxml import etree
 from zope.component import getAdapter
 from zope.component import getMultiAdapter
 from zope.interface import implements
@@ -103,8 +105,26 @@ class CalendarView(BrowserView):
     def OPTIONS(self, REQUEST, RESPONSE):
         """Retrieve OPTIONS.
         """
-        RESPONSE.setHeader('Allow', ', '.join(['PROPFIND', 'OPTIONS']))
+        RESPONSE.setHeader('Allow', ', '.join(['PROPFIND', 'OPTIONS', 'REPORT']))
         RESPONSE.setHeader('Content-Length', 0)
         RESPONSE.setHeader('DAV', '1, 2, calendar-access')
         RESPONSE.setStatus(200)
+        return RESPONSE
+
+    security.declarePublic('REPORT')
+    @authenticated
+    def REPORT(self, REQUEST, RESPONSE):
+        """Retrieve REPORT.
+        """
+        REQUEST.stdin.seek(0)
+        REQUEST.set('BODY', REQUEST.stdin.read())
+
+        report_name = etree.fromstring(REQUEST.get('BODY')).tag
+        report = getMultiAdapter((self.context, REQUEST), IDAVReport,
+                                 name=report_name)
+
+        response_data = report()
+        RESPONSE.setStatus(207)
+        RESPONSE.setHeader('Content-Type', 'text/xml; charset="utf-8"')
+        RESPONSE.setBody(response_data)
         return RESPONSE

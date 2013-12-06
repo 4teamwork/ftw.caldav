@@ -9,6 +9,12 @@ PROP_ALLPROPS = 'all property values'
 PROP_SELECTPROPS = 'selected property values only'
 
 
+NAMESPACES = {'dav': 'DAV:',
+              'cs': 'http://calendarserver.org/ns/',
+              'cal': 'urn:ietf:params:xml:ns:caldav'}
+
+
+
 class ICalendar(Interface):
     """Marker interface for containers containing events.
     """
@@ -68,4 +74,24 @@ class IPROPFINDDocumentGenerator(Interface):
 
         For each property provider (``property_providers``), a response in the
         PROPFIND request is generated. Each provider must implement ICalDAVProperties.
+        """
+
+
+class IDAVReport(Interface):
+    """Adapter interface for REPORTs.
+    Reports are expected to be named adapters, where the name contains the
+    namespace and the name of the report tag in the form:
+    {namespace}name
+
+    Example:
+    name="{urn:ietf:params:xml:ns:caldav}calendar-multiget"
+    For the report http://tools.ietf.org/html/rfc4791#section-7.9
+    """
+
+    def __init__(context, request):
+        """Adapts context and request.
+        """
+
+    def __call__():
+        """Execute the REPORT request and return the response XML as string.
         """

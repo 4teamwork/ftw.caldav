@@ -9,6 +9,7 @@
 
     <include package=".browser" />
     <include package=".properties" />
+    <include package=".reports" />
     <include file="permissions.zcml" />
     <include file="patches.zcml" />
 
