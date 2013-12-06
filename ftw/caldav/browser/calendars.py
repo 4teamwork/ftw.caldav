@@ -89,7 +89,8 @@ class CalendarView(BrowserView):
 
         if REQUEST.getHeader('Depth', 'infinity') != '0':
             catalog = getToolByName(self.context, 'portal_catalog')
-            query = {'object_provides': event_interface_identifiers()}
+            query = {'object_provides': event_interface_identifiers(),
+                     'path': '/'.join(self.context.getPhysicalPath())}
             for brain in  catalog(query):
                 calendar = brain.getObject()
                 providers.append(
