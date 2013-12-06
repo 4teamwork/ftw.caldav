@@ -83,3 +83,22 @@ def parse_property_request(request_data):
         namespace, tagname = property.tag.lstrip('{').split('}')
         properties.append((tagname, namespace))
     return PROP_SELECTPROPS, properties
+
+
+def parse_proppatch_request(request_data):
+    """Parses the WebDAV PROPPATCH request body and returns a list of properties to
+    patch, each consisting of a tuple with namespace, name and new value.
+    """
+
+    root = etree.fromstring(request_data)
+    if root.xpath('//dav:remove', namespaces=NAMESPACES):
+        raise Exception('dav:remove not yet implemented')
+
+    properties = []
+    for node in root.xpath('//dav:set/dav:prop/*', namespaces=NAMESPACES):
+        # property.tag is -> '{namespace}tagname'
+        namespace, tagname = node.tag.lstrip('{').split('}')
+        value = node.text
+        properties.append((namespace, tagname, value))
+
+    return properties

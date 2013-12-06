@@ -34,6 +34,15 @@ class CalendarsCollectionProperties(CalDAVPropertiesAdapter):
 class CalendarProperties(CalDAVPropertiesAdapter):
     adapts(ICalendar, Interface)
 
+    properties = (
+        {'name': 'calendar-color',
+         'namespace': 'http://apple.com/ns/ical/',
+         'storage': 'user'},
+
+        {'name': 'calendar-order',
+         'namespace': 'http://apple.com/ns/ical/',
+         'storage': 'user'}, )
+
     def get_href(self):
         return '/'.join((self.context.absolute_url(), 'caldav'))
 
