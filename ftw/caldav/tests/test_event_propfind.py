@@ -1,10 +1,13 @@
+from datetime import datetime
 from ftw.builder import Builder
 from ftw.builder import create
 from ftw.caldav.testing import CALDAV_ZSERVER_FUNCTIONAL_TESTING
 from ftw.caldav.tests.pages import propfind
 from ftw.testbrowser import browsing
+from plone.event.utils import utc
 from plone.uuid.interfaces import IUUID
 from unittest2 import TestCase
+import re
 
 
 class TestEventPropfind(TestCase):
@@ -65,3 +68,45 @@ class TestEventPropfind(TestCase):
                           propfind.status_for_property('getetag'))
         self.assertEquals('"%s"' % IUUID(event),
                           propfind.property_value('getetag'))
+
+    @browsing
+    def test_calendar_data(self, browser):
+        event = create(Builder('event')
+                       .titled(u'Carnival in Bern')
+                       .having(location=u'Bern')
+                       .starting(datetime(2014, 4, 6, 05, 00))
+                       .ending(datetime(2014, 4, 8, 12, 00)))
+
+        self.propfind(browser, event, 'urn:ietf:params:xml:ns:caldav', 'calendar-data')
+        self.assertEquals('HTTP/1.1 200 OK',
+                          propfind.status_for_property('calendar-data'))
+
+        expected = ''.join((
+                'BEGIN:VCALENDAR VERSION:2.0'
+                ' PRODID:-//Plone.org//NONSGML plone.app.event//EN'
+                ' X-WR-CALNAME:Carnival in Bern'
+                ' X-WR-RELCALID:%(uuid)s'
+                ' X-WR-TIMEZONE:Europe/Vienna '
+                'BEGIN:VEVENT'
+                ' SUMMARY:Carnival in Bern'
+                ' DTSTART;TZID=Etc/Greenwich;VALUE=DATE-TIME:20140406T050000'
+                ' DTEND;TZID=Etc/Greenwich;VALUE=DATE-TIME:20140408T120000'
+#                ' DTSTAMP;VALUE=DATE-TIME:20131206T093327Z'
+                ' UID:%(uuid)s'
+#                ' CREATED;VALUE=DATE-TIME:%(created)s'
+#                ' LAST-MODIFIED;VALUE=DATE-TIME:%(last-modified)s'
+                ' LOCATION:Bern'
+                ' URL:http://localhost:55001/plone/carnival-in-bern '
+                'END:VEVENT '
+                'END:VCALENDAR')) % {
+
+            'uuid': IUUID(event)}
+
+        got = propfind.property_value('calendar-data')
+
+        # Remove all times / dates which are changing and are not precisely predictable
+        got = re.sub(r' DTSTAMP;[^ ]*? ', ' ', got)
+        got = re.sub(r' CREATED;[^ ]*? ', ' ', got)
+        got = re.sub(r' LAST-MODIFIED;[^ ]*? ', ' ', got)
+
+        self.assertEquals(expected, got)

@@ -4,6 +4,7 @@ from ftw.caldav.properties.adapter import caldav_callback
 from ftw.caldav.properties.adapter import caldav_property
 from lxml import etree
 from plone.event.interfaces import IEvent
+from plone.event.interfaces import IICalendar
 from plone.uuid.interfaces import IUUID
 from zope.component import adapts
 from zope.interface import Interface
@@ -51,3 +52,10 @@ class EventProperties(CalDAVPropertiesAdapter):
         """http://tools.ietf.org/html/rfc2518#section-13.6
         """
         return '"%s"' % IUUID(self.context)
+
+    @caldav_property('calendar-data', 'urn:ietf:params:xml:ns:caldav')
+    def calendar_data(self):
+        """http://tools.ietf.org/html/rfc4791#section-9.6
+        """
+        cal = IICalendar(self.context)
+        return cal.to_ical()
