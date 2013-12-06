@@ -5,6 +5,11 @@ from setuptools import setup, find_packages
 version = '1.2.1.dev0'
 
 
+extras_require = {
+    'calendar': ['plone.app.dexterity'],
+    'events': ['plone.app.event [ploneintegration]'],
+    }
+
 tests_require = [
     'ftw.builder',
     'ftw.testbrowser',
@@ -13,7 +18,9 @@ tests_require = [
     'plone.app.testing',
     'unittest2',
     'zope.configuration',
-    ]
+    ] + reduce(list.__add__, extras_require.values())
+
+extras_require['tests'] = tests_require
 
 
 setup(name='ftw.caldav',
@@ -47,7 +54,7 @@ setup(name='ftw.caldav',
         ],
 
       tests_require=tests_require,
-      extras_require=dict(tests=tests_require),
+      extras_require=extras_require,
 
       entry_points="""
       # -*- Entry points: -*-
