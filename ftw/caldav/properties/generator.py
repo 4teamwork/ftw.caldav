@@ -10,7 +10,6 @@ from zope.interface import implements
 import httplib
 
 
-
 def group_properties_by_status_code(properties):
     result = defaultdict(list)
     for property in properties:
@@ -62,7 +61,12 @@ class PROPFINDDocumentGenerator(object):
                 if 'callback' in property:
                     property['callback'](prop_node)
                 elif 'value' in property:
-                    prop_node.text = str(property['value'])
+                    value = property['value']
+                    if isinstance(value, str):
+                        prop_node.text = value.decode('utf-8')
+                    else:
+                        prop_node.text = unicode(value)
+
                 if (property['name'], property['namespace']) in missing_properties:
                     missing_properties.remove(
                         (property['name'], property['namespace']))
