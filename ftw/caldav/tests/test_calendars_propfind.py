@@ -48,7 +48,8 @@ class TestPropfindOnPrincipal(TestCase):
              '.../first-calendar/caldav':
                  {'HTTP/1.1 200 OK':
                       {'displayname': 'First Calendar',
-                       'resourcetype': '<resourcetype><calendar/></resourcetype>'}}},
+                       'resourcetype': '<resourcetype><collection/><calendar/>' + \
+                           '</resourcetype>'}}},
 
             propfind.propfind_data())
 
@@ -69,11 +70,11 @@ class TestCalendarProperties(TestCase):
                                data=req_body, headers=headers)
 
     @browsing
-    def test_resourcetype_is_calendar(self, browser):
+    def test_resourcetype(self, browser):
         self.propfind(browser, 'DAV:', 'resourcetype')
         self.assertEquals('HTTP/1.1 200 OK',
                           propfind.status_for_property('resourcetype'))
-        self.assertEquals(['calendar'],
+        self.assertEquals(['collection', 'calendar'],
                           propfind.property_type('resourcetype'))
 
     @browsing
