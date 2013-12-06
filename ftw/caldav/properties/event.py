@@ -45,3 +45,9 @@ class EventProperties(CalDAVPropertiesAdapter):
         """http://tools.ietf.org/html/rfc2518#section-13.5
         """
         return 'text/calendar; component=vevent'
+
+    @caldav_property('getetag', 'DAV:')
+    def getetag(self):
+        """http://tools.ietf.org/html/rfc2518#section-13.6
+        """
+        return '"%s"' % IUUID(self.context)

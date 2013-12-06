@@ -57,11 +57,11 @@ class TestEventPropfind(TestCase):
         self.assertEquals('text/calendar; component=vevent',
                           propfind.property_value('getcontenttype'))
 
-    # @browsing
-    # def test_getetag_returns_uuid_as_quoted_string(self, browser):
-    #     event = create(Builder('event'))
-    #     self.propfind(browser, event, 'DAV:', 'getetag')
-    #     self.assertEquals('HTTP/1.1 200 OK',
-    #                       propfind.status_for_property('getetag'))
-    #     self.assertEquals('"%s"' % IUUID(event),
-    #                       propfind.property_value('getetag'))
+    @browsing
+    def test_getetag_returns_uuid_as_quoted_string(self, browser):
+        event = create(Builder('event'))
+        self.propfind(browser, event, 'DAV:', 'getetag')
+        self.assertEquals('HTTP/1.1 200 OK',
+                          propfind.status_for_property('getetag'))
+        self.assertEquals('"%s"' % IUUID(event),
+                          propfind.property_value('getetag'))
