@@ -1,15 +1,14 @@
 from collections import defaultdict
 from ftw.caldav.interfaces import IPROPFINDDocumentGenerator
+from ftw.caldav.interfaces import NAMESPACES
+from ftw.caldav.interfaces import PROP_PROPNAMES
+from ftw.caldav.utils import parse_property_request
 from lxml import etree
 from zope.component import adapts
 from zope.interface import Interface
 from zope.interface import implements
 import httplib
 
-
-NAMESPACES = {'dav': 'DAV:',
-              'cs': 'http://calendarserver.org/ns/',
-              'cal': 'urn:ietf:params:xml:ns:caldav'}
 
 
 def group_properties_by_status_code(properties):
@@ -84,14 +83,10 @@ class PROPFINDDocumentGenerator(object):
 
     def generate(self, property_providers, subobjects=None):
         names_only = False
-        properties = self._extract_request_properties()
+        prop_mode, properties = parse_property_request(self.request.get('BODY'))
 
-        if properties == 'all-names':
+        if prop_mode == PROP_PROPNAMES:
             names_only = True
-            properties = None
-
-        elif properties == 'all-properties':
-            properties = None
 
         document = self.create_document()
         for provider in property_providers:
@@ -105,20 +100,3 @@ class PROPFINDDocumentGenerator(object):
         response.setHeader('Content-Type', 'text/xml; charset="utf-8"')
         response.setBody(etree.tostring(document, pretty_print=True))
         return response
-
-    def _extract_request_properties(self):
-        body = self.request.get('BODY')
-        root = etree.fromstring(body)
-
-        if root.xpath('//dav:propname', namespaces=NAMESPACES):
-            return 'all-names'
-
-        elif root.xpath('//dav:allprop', namespaces=NAMESPACES):
-            return 'all-properties'
-
-        properties = []
-        for property in root.xpath('//dav:prop/*', namespaces=NAMESPACES):
-            # property.tag is -> '{namespace}tagname'
-            namespace, tagname = property.tag.lstrip('{').split('}')
-            properties.append((tagname, namespace))
-        return properties

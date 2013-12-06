@@ -1,5 +1,13 @@
 from zope.interface import Interface
 
+NAMESPACES = {'dav': 'DAV:',
+              'cs': 'http://calendarserver.org/ns/',
+              'cal': 'urn:ietf:params:xml:ns:caldav'}
+
+PROP_PROPNAMES = 'all names'
+PROP_ALLPROPS = 'all property values'
+PROP_SELECTPROPS = 'selected property values only'
+
 
 class ICalendar(Interface):
     """Marker interface for containers containing events.

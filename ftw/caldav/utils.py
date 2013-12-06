@@ -1,4 +1,9 @@
 from Products.CMFCore.utils import getToolByName
+from ftw.caldav.interfaces import NAMESPACES
+from ftw.caldav.interfaces import PROP_ALLPROPS
+from ftw.caldav.interfaces import PROP_PROPNAMES
+from ftw.caldav.interfaces import PROP_SELECTPROPS
+from lxml import etree
 from zope.component import getUtility
 from zope.component.hooks import getSite
 from zope.dottedname.resolve import resolve
@@ -45,3 +50,36 @@ def event_interface_identifiers():
     Not existing / not importable interfaces are filtered silently.
     """
     return map(lambda iface: iface.__identifier__, event_interfaces())
+
+
+def parse_property_request(request_data):
+    """Parses a WebDAV property request (PROPFIND, REPORT, ...) and returns the
+    requested mode and the list of properties as tuple of tagname and namespace.
+
+    Supported modes:
+
+    <DAV:propname> -- The names of supported properties should be returned,
+    without values.
+    Example: (PROP_PROPNAMES, None)
+
+    <DAV:allprop> -- Return all property values.
+    Example: (PROP_ALLPROPS, None)
+
+    <DAV:prop> -- Return selected property values only.
+    Example: (PROP_SELECTPROPS, [('displayname', 'DAV:')])
+    """
+
+    root = etree.fromstring(request_data)
+
+    if root.xpath('//dav:propname', namespaces=NAMESPACES):
+        return PROP_PROPNAMES, None
+
+    elif root.xpath('//dav:allprop', namespaces=NAMESPACES):
+        return PROP_ALLPROPS, None
+
+    properties = []
+    for property in root.xpath('//dav:prop/*', namespaces=NAMESPACES):
+        # property.tag is -> '{namespace}tagname'
+        namespace, tagname = property.tag.lstrip('{').split('}')
+        properties.append((tagname, namespace))
+    return PROP_SELECTPROPS, properties
