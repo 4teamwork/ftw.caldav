@@ -111,7 +111,7 @@ class CalendarView(BrowserView):
         RESPONSE.setStatus(200)
         return RESPONSE
 
-    security.declarePublic('REPORT')
+    security.declareProtected(webdav_access, 'REPORT')
     @authenticated
     def REPORT(self, REQUEST, RESPONSE):
         """Retrieve REPORT.
