@@ -48,6 +48,15 @@ class TestEventPropfind(TestCase):
                      '</owner>')),
             propfind.property_xml('owner'))
 
+    @browsing
+    def test_getcontenttype(self, browser):
+        event = create(Builder('event'))
+        self.propfind(browser, event, 'DAV:', 'getcontenttype')
+        self.assertEquals('HTTP/1.1 200 OK',
+                          propfind.status_for_property('getcontenttype'))
+        self.assertEquals('text/calendar; component=vevent',
+                          propfind.property_value('getcontenttype'))
+
     # @browsing
     # def test_getetag_returns_uuid_as_quoted_string(self, browser):
     #     event = create(Builder('event'))

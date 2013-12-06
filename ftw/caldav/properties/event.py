@@ -39,3 +39,9 @@ class EventProperties(CalDAVPropertiesAdapter):
         owner_id = self.context.getOwner().getId()
         etree.SubElement(parent_node, '{DAV:}href').text = '/'.join(
             (portal_url(), 'caldav-principal', owner_id))
+
+    @caldav_property('getcontenttype', 'DAV:')
+    def getcontenttype(self):
+        """http://tools.ietf.org/html/rfc2518#section-13.5
+        """
+        return 'text/calendar; component=vevent'
