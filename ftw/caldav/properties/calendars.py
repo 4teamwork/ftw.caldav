@@ -9,6 +9,7 @@ from lxml import etree
 from plone.uuid.interfaces import IUUID
 from zope.component import adapts
 from zope.interface import Interface
+import icalendar
 
 
 class CalendarsCollectionProperties(CalDAVPropertiesAdapter):
@@ -88,6 +89,23 @@ class CalendarProperties(CalDAVPropertiesAdapter):
         """
         etree.SubElement(parent_node, '{urn:ietf:params:xml:ns:caldav}comp',
                          {'name': 'VEVENT'})
+
+    @caldav_property('calendar-timezone', 'urn:ietf:params:xml:ns:caldav')
+    def calendar_timezone(self):
+        """http://tools.ietf.org/html/rfc4791#section-5.2.2
+        """
+        try:
+            from plone.app.event.base import default_timezone
+        except ImportError:
+            timezone = 'UTC'
+        else:
+            timezone = default_timezone()
+
+        calendar = icalendar.Calendar()
+        tzc = icalendar.Timezone()
+        tzc.add('tzid', timezone)
+        calendar.add_component(tzc)
+        return calendar.to_ical()
 
     @caldav_property('getctag', 'http://calendarserver.org/ns/')
     def getctag(self):

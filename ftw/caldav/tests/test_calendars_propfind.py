@@ -136,6 +136,21 @@ class TestCalendarProperties(TestCase):
             propfind.property_xml(propname))
 
     @browsing
+    def test_calendar_timezone(self, browser):
+        self.propfind(browser, 'urn:ietf:params:xml:ns:caldav', 'calendar-timezone')
+        self.assertEquals('HTTP/1.1 200 OK',
+                          propfind.status_for_property('calendar-timezone'))
+
+        expected = ' '.join((
+                'BEGIN:VCALENDAR',
+                'BEGIN:VTIMEZONE',
+                'TZID:Europe/Vienna',
+                'END:VTIMEZONE',
+                'END:VCALENDAR'))
+
+        self.assertEquals(expected, propfind.property_value('calendar-timezone'))
+
+    @browsing
     def test_getctag_does_not_change_when_nothing_changed(self, browser):
         self.propfind(browser, 'http://calendarserver.org/ns/', 'getctag')
         self.assertEquals('HTTP/1.1 200 OK',
