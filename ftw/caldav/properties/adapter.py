@@ -1,5 +1,6 @@
 from AccessControl import getSecurityManager
 from BTrees.OOBTree import OOBTree
+from Products.CMFCore.utils import getToolByName
 from ftw.caldav.interfaces import ICalDAVProperties
 from zope.annotation.interfaces import IAnnotations
 from zope.component import adapts
@@ -139,14 +140,21 @@ class CalDAVPropertiesAdapter(object):
                                             name, value)
 
     def get_storage(self, storage_name):
-        annotations = IAnnotations(self.context)
+        if storage_name in ('context', 'user@context'):
+            annotations = IAnnotations(self.context)
+        elif storage_name == 'user':
+            portal = getToolByName(self.context, 'portal_url').getPortalObject()
+            annotations = IAnnotations(portal)
+        else:
+            raise ValueError('Unkown storage: "%s"' % storage_name)
+
         if storage_name == 'context':
             if ANNOTATIONS_USER_KEY not in annotations:
                 annotations[ANNOTATIONS_CONTEXT_KEY] = OOBTree()
 
             return annotations[ANNOTATIONS_CONTEXT_KEY]
 
-        elif storage_name == 'user':
+        elif storage_name in ('user@context', 'user'):
             if ANNOTATIONS_USER_KEY not in annotations:
                 annotations[ANNOTATIONS_USER_KEY] = OOBTree()
 

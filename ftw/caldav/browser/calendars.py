@@ -2,16 +2,14 @@ from AccessControl import ClassSecurityInfo
 from AccessControl import Unauthorized
 from AccessControl.Permissions import webdav_access
 from Products.CMFCore.utils import getToolByName
-from collections import defaultdict
 from ftw.caldav.browser.helpers import authenticated
+from ftw.caldav.browser.proppatch import PROPPATCH
 from ftw.caldav.interfaces import ICalDAVProperties
 from ftw.caldav.interfaces import ICalendar
 from ftw.caldav.interfaces import IDAVReport
 from ftw.caldav.interfaces import IPROPFINDDocumentGenerator
-from ftw.caldav.interfaces import NAMESPACES
 from ftw.caldav.properties.calendars import CalendarsCollectionProperties
 from ftw.caldav.utils import event_interface_identifiers
-from ftw.caldav.utils import parse_proppatch_request
 from lxml import etree
 from zope.component import getAdapter
 from zope.component import getMultiAdapter
@@ -19,7 +17,6 @@ from zope.interface import implements
 from zope.publisher.browser import BrowserView
 from zope.publisher.interfaces import IPublishTraverse
 from zope.publisher.interfaces import NotFound
-import httplib
 
 
 class CalendarsView(BrowserView):
@@ -75,11 +72,20 @@ class CalendarsView(BrowserView):
     def OPTIONS(self, REQUEST, RESPONSE):
         """Retrieve OPTIONS.
         """
-        RESPONSE.setHeader('Allow', ', '.join(['PROPFIND', 'OPTIONS']))
+        RESPONSE.setHeader('Allow', ', '.join(['PROPFIND', 'OPTIONS', 'PROPPATCH']))
         RESPONSE.setHeader('Content-Length', 0)
         RESPONSE.setHeader('DAV', '1, 2, calendar-access')
         RESPONSE.setStatus(200)
         return RESPONSE
+
+    security.declareProtected(webdav_access, 'PROPPATCH')
+    @authenticated
+    def PROPPATCH(self, REQUEST, RESPONSE):
+        """Retrieve OPTIONS.
+        """
+        member = self.getMember()
+        provider = CalendarsCollectionProperties(member, self.request)
+        return PROPPATCH(member, REQUEST, RESPONSE, provider=provider)
 
 
 class CalendarView(BrowserView):
@@ -134,42 +140,9 @@ class CalendarView(BrowserView):
         RESPONSE.setBody(response_data)
         return RESPONSE
 
-    security.declarePublic('PROPPATCH')
+    security.declareProtected(webdav_access, 'PROPPATCH')
     @authenticated
     def PROPPATCH(self, REQUEST, RESPONSE):
         """Retrieve OPTIONS.
         """
-
-        properties = parse_proppatch_request(REQUEST.get('BODY'))
-        provider = getMultiAdapter((self.context, self.request), ICalDAVProperties)
-
-        result = defaultdict(list)
-        for namespace, name, value in properties:
-            try:
-                provider.set_property(namespace, name, value)
-            except NotFound:
-                result[404].append((namespace, name))
-            else:
-                result[200].append((namespace, name))
-
-        document = etree.Element('{DAV:}multistatus', nsmap=NAMESPACES)
-        response = etree.SubElement(document, '{DAV:}response')
-        etree.SubElement(response, '{DAV:}href').text = (
-            self.context.absolute_url() + '/caldav')
-
-        for code, props in result.items():
-            propstat = etree.SubElement(response, '{DAV:}propstat')
-            prop = etree.SubElement(propstat, '{DAV:}prop')
-
-            for namespace, name in props:
-                etree.SubElement(prop, '{%s}%s' % (namespace, name))
-
-
-            etree.SubElement(propstat, '{DAV:}status').text = 'HTTP/1.1 %s %s' % (
-                code, httplib.responses[code])
-
-        response_data = etree.tostring(document, pretty_print=True)
-        RESPONSE.setStatus(207)
-        RESPONSE.setHeader('Content-Type', 'text/xml; charset="utf-8"')
-        RESPONSE.setBody(response_data)
-        return RESPONSE
+        return PROPPATCH(self.context, REQUEST, RESPONSE)

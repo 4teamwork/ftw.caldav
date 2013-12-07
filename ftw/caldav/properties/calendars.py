@@ -19,6 +19,15 @@ class CalendarsCollectionProperties(CalDAVPropertiesAdapter):
     """
     adapts(IMemberData, Interface)
 
+    properties = (
+        {'name': 'default-alarm-vevent-date',
+         'namespace': 'urn:ietf:params:xml:ns:caldav',
+         'storage': 'user'},
+
+        {'name': 'default-alarm-vevent-datetime',
+         'namespace': 'urn:ietf:params:xml:ns:caldav',
+         'storage': 'user'}, )
+
     def get_href(self):
         urltool = getToolByName(self.context, 'portal_url')
         return '/'.join((urltool(), 'caldav-calendars', self.context.getId()))
@@ -37,11 +46,11 @@ class CalendarProperties(CalDAVPropertiesAdapter):
     properties = (
         {'name': 'calendar-color',
          'namespace': 'http://apple.com/ns/ical/',
-         'storage': 'user'},
+         'storage': 'user@context'},
 
         {'name': 'calendar-order',
          'namespace': 'http://apple.com/ns/ical/',
-         'storage': 'user'}, )
+         'storage': 'user@context'}, )
 
     def get_href(self):
         return '/'.join((self.context.absolute_url(), 'caldav'))
