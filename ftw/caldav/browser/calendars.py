@@ -11,12 +11,14 @@ from ftw.caldav.interfaces import IPROPFINDDocumentGenerator
 from ftw.caldav.properties.calendars import CalendarsCollectionProperties
 from ftw.caldav.utils import event_interface_identifiers
 from lxml import etree
+from plone.app.event.ical.importer import ical_import
 from zope.component import getAdapter
 from zope.component import getMultiAdapter
 from zope.interface import implements
 from zope.publisher.browser import BrowserView
 from zope.publisher.interfaces import IPublishTraverse
 from zope.publisher.interfaces import NotFound
+import icalendar
 
 
 class CalendarsView(BrowserView):
@@ -89,8 +91,25 @@ class CalendarsView(BrowserView):
 
 
 class CalendarView(BrowserView):
+    implements(IPublishTraverse)
+
     security = ClassSecurityInfo()
     security.setPermissionDefault(webdav_access, ('Authenticated', 'Manager'))
+
+    def __init__(self, context, request):
+        super(CalendarView, self).__init__(context, request)
+        self.path = None
+
+    def publishTraverse(self, request, name):
+        if name in dir(self):
+            return getattr(self, name)
+
+        elif self.path is not None:
+            raise NotFound(self, name)
+
+        else:
+            self.path = name
+            return self
 
     security.declareProtected(webdav_access, 'PROPFIND')
     @authenticated
@@ -116,7 +135,7 @@ class CalendarView(BrowserView):
         """Retrieve OPTIONS.
         """
         RESPONSE.setHeader('Allow', ', '.join(['PROPFIND', 'OPTIONS', 'REPORT',
-                                               'PROPPATCH']))
+                                               'PROPPATCH', 'PUT']))
         RESPONSE.setHeader('Content-Length', 0)
         RESPONSE.setHeader('DAV', '1, 2, calendar-access')
         RESPONSE.setStatus(200)
@@ -146,3 +165,27 @@ class CalendarView(BrowserView):
         """Retrieve OPTIONS.
         """
         return PROPPATCH(self.context, REQUEST, RESPONSE)
+
+    security.declareProtected(webdav_access, 'PUT')
+    @authenticated
+    def PUT(self, REQUEST, RESPONSE):
+        """PUT objects.
+        """
+
+        content_type = REQUEST.getHeader('Content-Type')
+        if content_type != 'text/calendar':
+            raise Exception('Unkown PUT content type: %s' % content_type)
+
+        ical_data = REQUEST.get('BODY')
+        ical_import(self.context, ical_data, 'plone.app.event.dx.event')
+
+        cal = icalendar.Calendar.from_ical(ical_data)
+        sync_uid = cal.walk('VEVENT')[0].decoded('UID')
+        catalog = getToolByName(self.context, 'portal_catalog')
+        brain = catalog(sync_uid=sync_uid,
+                        path={'query': '/'.join(self.context.getPhysicalPath()),
+                              'depth': 1})[0]
+        RESPONSE.setHeader('ETag', '"%s"' % brain.UID)
+
+        RESPONSE.setStatus(201)
+        return RESPONSE
