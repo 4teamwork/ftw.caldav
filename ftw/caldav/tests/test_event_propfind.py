@@ -4,7 +4,6 @@ from ftw.builder import create
 from ftw.caldav.testing import CALDAV_ZSERVER_FUNCTIONAL_TESTING
 from ftw.caldav.tests.pages import propfind
 from ftw.testbrowser import browsing
-from plone.event.utils import utc
 from plone.uuid.interfaces import IUUID
 from unittest2 import TestCase
 import re
@@ -96,11 +95,12 @@ class TestEventPropfind(TestCase):
 #                ' CREATED;VALUE=DATE-TIME:%(created)s'
 #                ' LAST-MODIFIED;VALUE=DATE-TIME:%(last-modified)s'
                 ' LOCATION:Bern'
-                ' URL:http://localhost:55001/plone/carnival-in-bern '
+                ' URL:%(url)s '
                 'END:VEVENT '
                 'END:VCALENDAR')) % {
 
-            'uuid': IUUID(event)}
+            'uuid': IUUID(event),
+            'url': event.absolute_url()}
 
         got = propfind.property_value('calendar-data')
 
