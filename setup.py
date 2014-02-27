@@ -7,7 +7,7 @@ version = '1.2.1.dev0'
 
 extras_require = {
     'calendar': ['plone.app.dexterity'],
-    'events': ['plone.app.event'],
+    'events': ['plone.app.event>=1.1b1'],
     }
 
 tests_require = [
