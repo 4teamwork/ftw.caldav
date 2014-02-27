@@ -83,6 +83,8 @@ class TestEventPropfind(TestCase):
         expected = ''.join((
                 'BEGIN:VCALENDAR VERSION:2.0'
                 ' PRODID:-//Plone.org//NONSGML plone.app.event//EN'
+                ' X-WR-CALNAME:Carnival in Bern'
+                ' X-WR-RELCALID:%(uuid)s'
                 ' X-WR-TIMEZONE:Europe/Vienna '
                 'BEGIN:VEVENT'
                 ' SUMMARY:Carnival in Bern'
